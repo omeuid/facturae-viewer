@@ -24,12 +24,14 @@ public sealed partial class MainViewModel : ObservableObject
 {
     private readonly IDialogService _dialogs;
     private readonly IPdfService _pdf;
+    private readonly RecentFilesService _recent;
     private IReadOnlyList<InvoiceDisplay> _invoices = new List<InvoiceDisplay>();
 
-    public MainViewModel(IDialogService dialogs, IPdfService pdf)
+    public MainViewModel(IDialogService dialogs, IPdfService pdf, RecentFilesService? recent = null)
     {
         _dialogs = dialogs;
         _pdf = pdf;
+        _recent = recent ?? new RecentFilesService();
     }
 
     [ObservableProperty]
@@ -65,6 +67,9 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isDragOver;
 
+    /// <summary>Rutas recientes (cadenas escapadas) mostradas en el menú.</summary>
+    public IList<string> RecentFiles { get; set; } = new ObservableCollection<string>();
+
     [RelayCommand]
     private void Open()
     {
@@ -95,6 +100,9 @@ public sealed partial class MainViewModel : ObservableObject
                 ? (report.HasWarnings ? "Válido con avisos" : "Válido")
                 : "Inválido";
             SummaryText = $"{report.PassedCount} correctas · {report.WarningCount} avisos · {report.ErrorCount} errores";
+
+            _recent.Add(path);
+            RefreshRecentFiles();
 
             CurrentIndex = 0;
             return true;
@@ -199,5 +207,26 @@ public sealed partial class MainViewModel : ObservableObject
                 try { File.Delete(tempPath); } catch (IOException) { }
             }
         }
+    }
+
+    private void RefreshRecentFiles()
+    {
+        RecentFiles = new ObservableCollection<string>(
+            _recent.Get().Select(RecentFilesService.SafePath));
+        OnPropertyChanged(nameof(RecentFiles));
+    }
+
+    /// <summary>Para el servicio de single-instance (Task de escucha) al salir.</summary>
+    public void Shutdown()
+    {
+        SingleInstance.Stop();
+    }
+
+    /// <summary>Borra la lista de ficheros recientes (opción de línea de comandos).</summary>
+    [RelayCommand]
+    private void ClearRecentFiles()
+    {
+        _recent.RemoveAll();
+        RefreshRecentFiles();
     }
 }

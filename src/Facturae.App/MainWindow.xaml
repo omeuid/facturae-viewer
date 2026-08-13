@@ -23,41 +23,54 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Barra de herramientas -->
-        <Border Grid.Row="0" Background="#FF3F3F46" Padding="10,8">
-            <DockPanel>
-                <Button DockPanel.Dock="Left" Content="Abrir…"
-                        Command="{Binding OpenCommand}"
-                        Padding="14,5" FontWeight="SemiBold"
-                        ToolTip="Abrir un fichero .xsig, .xpsig o .xml" />
+        <!-- Barra de menús y herramientas -->
+        <Border Grid.Row="0" Background="#FF3F3F46" Padding="0">
+            <StackPanel>
+                <Menu Background="Transparent" Foreground="White" Padding="4,2">
+                    <MenuItem Header="Archivo">
+                        <MenuItem Header="Abrir…" Command="{Binding OpenCommand}" />
+                        <MenuItem Header="Salir" Click="ExitMenu_Click" />
+                    </MenuItem>
+                    <MenuItem x:Name="RecentsMenu" Header="Recientes">
+                        <MenuItem Header="(vacío)" IsEnabled="False" />
+                    </MenuItem>
+                </Menu>
+                <Border Padding="10,8">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Left" Content="Abrir…"
+                                Command="{Binding OpenCommand}"
+                                Padding="14,5" FontWeight="SemiBold"
+                                ToolTip="Abrir un fichero .xsig, .xpsig o .xml" />
 
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Facturas:"
-                               Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="0,0,6,0" />
-                    <Button Content="‹" Command="{Binding GoPreviousCommand}"
-                            ToolTip="Factura anterior" Width="32" FontSize="16" Margin="0,0,4,0" />
-                    <TextBlock VerticalAlignment="Center" Foreground="White" Margin="0,0,4,0">
-                        <Run Text="{Binding CurrentIndex, Mode=OneWay}" />
-                        <Run Text="/" />
-                        <Run Text="{Binding TotalInvoices, Mode=OneWay}" />
-                    </TextBlock>
-                    <Button Content="›" Command="{Binding GoNextCommand}"
-                            ToolTip="Factura siguiente" Width="32" FontSize="16" />
-                </StackPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Facturas:"
+                                       Foreground="#FFD0D0D0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                            <Button Content="‹" Command="{Binding GoPreviousCommand}"
+                                    ToolTip="Factura anterior" Width="32" FontSize="16" Margin="0,0,4,0" />
+                            <TextBlock VerticalAlignment="Center" Foreground="White" Margin="0,0,4,0">
+                                <Run Text="{Binding CurrentIndex, Mode=OneWay}" />
+                                <Run Text="/" />
+                                <Run Text="{Binding TotalInvoices, Mode=OneWay}" />
+                            </TextBlock>
+                            <Button Content="›" Command="{Binding GoNextCommand}"
+                                    ToolTip="Factura siguiente" Width="32" FontSize="16" />
+                        </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0">
-                    <Button Content="Exportar a PDF…" Command="{Binding ExportPdfCommand}"
-                            Padding="14,5" Margin="0,0,8,0"
-                            ToolTip="Guardar la factura actual como documento PDF" />
-                    <Button Content="Imprimir…" Command="{Binding PrintCommand}"
-                            Padding="14,5"
-                            ToolTip="Vista previa e impresión de la factura actual" />
-                </StackPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0">
+                            <Button Content="Exportar a PDF…" Command="{Binding ExportPdfCommand}"
+                                    Padding="14,5" Margin="0,0,8,0"
+                                    ToolTip="Guardar la factura actual como documento PDF" />
+                            <Button Content="Imprimir…" Command="{Binding PrintCommand}"
+                                    Padding="14,5"
+                                    ToolTip="Vista previa e impresión de la factura actual" />
+                        </StackPanel>
 
-                <TextBlock Text="{Binding FileName}" Foreground="White"
-                           FontWeight="SemiBold" FontSize="14"
-                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-            </DockPanel>
+                        <TextBlock Text="{Binding FileName}" Foreground="White"
+                                   FontWeight="SemiBold" FontSize="14"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    </DockPanel>
+                </Border>
+            </StackPanel>
         </Border>
 
         <!-- Contenido -->
