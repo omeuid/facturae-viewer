@@ -5,7 +5,7 @@ Windows 10/11. Permite abrir ficheros `.xsig` (facturas firmadas), `.xpsig` y `.
 (sin firmar), validar el formato (XSD) y la firma electrónica, visualizarlas con una
 interfaz clara y exportarlas a PDF o imprimirlas.
 
-> **Estado:** en desarrollo (fase 1 de 7 — ver [`docs/PLAN.md`](docs/PLAN.md)).
+> **Estado:** completo (7/7 fases — ver [`docs/PLAN.md`](docs/PLAN.md)).
 
 ## Características (objetivo)
 
@@ -52,7 +52,35 @@ El ejecutable es `artifacts\publish\FacturaeViewer.exe` (autocontenido, no requi
 
 ## Generar el instalador
 
-*Pendiente de la fase 7. Instrucciones detalladas se añadirán en `installer/README.md`.*
+Requisito: [Inno Setup 6](https://jrsoftware.org/isdl.php) con `iscc` en el PATH.
+
+1. Publicar el ejecutable portable:
+
+   ```powershell
+   dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish
+   ```
+
+2. Compilar el instalador:
+
+   ```powershell
+   iscc installer/setup.iss
+   ```
+
+   El instalador se genera en `artifacts\installer\FacturaeViewer-Setup.exe`. Regístra
+   la asociación de archivos `.xsig`, `.xpsig` y `.xml` en `HKCU` (sin permisos de
+   administrador) y crea los accesos directos.
+
+## Línea de comandos
+
+```
+FacturaeViewer.exe [opciones] [fichero]
+  --help, -h   Muestra la ayuda y sale.
+  --clear      Borra la lista de ficheros recientes.
+  [fichero]    Ruta de un fichero .xsig, .xpsig o .xml para abrir.
+```
+
+Sin argumentos abre la ventana vacía del visor. Al abrir desde un fichero asociado
+(doble clic) o por CLI, la ruta se entrega a la instancia ya abierta (single-instance).
 
 ## Estructura del proyecto
 

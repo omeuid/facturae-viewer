@@ -30,10 +30,24 @@ jobs:
       - name: Publish portable (win-x64)
         run: dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish
 
-      - name: Upload artefacto
+      - name: Upload artefacto portable
         uses: actions/upload-artifact@v4
         with:
           name: FacturaeViewer-win-x64
           path: artifacts/publish/FacturaeViewer.exe
 
-# El paso de instalador (Inno Setup / iscc) se añadirá en la fase 7 (ver docs/PLAN.md).
+      - name: Instalar Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          iscc /VERSION
+
+      - name: Compilar instalador
+        shell: pwsh
+        run: iscc installer/setup.iss
+
+      - name: Upload artefacto instalador
+        uses: actions/upload-artifact@v4
+        with:
+          name: FacturaeViewer-Setup
+          path: artifacts/installer/FacturaeViewer-Setup.exe
