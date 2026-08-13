@@ -5,6 +5,8 @@
 //     http://www.apache.org/licenses/LICENSE-2.0
 
 using System.Windows;
+using Facturae.App.Services;
+using Facturae.App.ViewModels;
 
 namespace Facturae.App;
 
@@ -13,5 +15,14 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        var viewModel = new MainViewModel(new DialogService());
+        var window = new MainWindow(viewModel);
+        MainWindow = window;
+        window.Show();
+
+        // Apertura opcional desde línea de comandos (uso completo en la fase 6).
+        if (e.Args.Length > 0)
+            viewModel.Load(e.Args[0]);
     }
 }

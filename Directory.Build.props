@@ -8,12 +8,8 @@
     <Deterministic>true</Deterministic>
     <AnalysisLevel>latest</AnalysisLevel>
 
-    <!-- Por defecto net10.0; la app WPF usa net10.0-windows. -->
+    <!-- Por defecto net10.0; la app WPF declara net10.0-windows y UseWPF en su propio csproj. -->
     <TargetFramework>net10.0</TargetFramework>
-    <TargetFramework Condition="'$(MSBuildProjectName)' == 'Facturae.App'">net10.0-windows</TargetFramework>
-
-    <!-- WPF habilitado solo donde se necesita. -->
-    <UseWPF Condition="'$(MSBuildProjectName)' == 'Facturae.App'">true</UseWPF>
 
     <!-- Metadatos del paquete/repo. -->
     <Version>0.1.0</Version>
