@@ -16,7 +16,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        var viewModel = new MainViewModel(new DialogService());
+        var viewModel = new MainViewModel(new DialogService(), new PdfService());
         var window = new MainWindow(viewModel);
         MainWindow = window;
         window.Show();

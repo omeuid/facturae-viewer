@@ -16,4 +16,7 @@ public interface IDialogService
 
     /// <summary>Muestra un mensaje de error al usuario.</summary>
     void ShowError(string title, string message);
+
+    /// <summary>Muestra un mensaje informativo al usuario.</summary>
+    void ShowInfo(string title, string message);
 }

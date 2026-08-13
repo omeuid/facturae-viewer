@@ -9,6 +9,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Facturae.App.Services;
+using Facturae.App.Views;
 using FacturaeViewer.Core.IO;
 using FacturaeViewer.Core.Model;
 using FacturaeViewer.Core.Validation;
@@ -22,11 +23,13 @@ namespace Facturae.App.ViewModels;
 public sealed partial class MainViewModel : ObservableObject
 {
     private readonly IDialogService _dialogs;
+    private readonly IPdfService _pdf;
     private IReadOnlyList<InvoiceDisplay> _invoices = new List<InvoiceDisplay>();
 
-    public MainViewModel(IDialogService dialogs)
+    public MainViewModel(IDialogService dialogs, IPdfService pdf)
     {
         _dialogs = dialogs;
+        _pdf = pdf;
     }
 
     [ObservableProperty]
@@ -117,6 +120,8 @@ public sealed partial class MainViewModel : ObservableObject
         HasDocument = false;
         TotalInvoices = 0;
         CurrentIndex = 0;
+        ExportPdfCommand.NotifyCanExecuteChanged();
+        PrintCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnCurrentIndexChanged(int value)
@@ -124,6 +129,8 @@ public sealed partial class MainViewModel : ObservableObject
         CurrentInvoice = _invoices.Count > value ? _invoices[value] : null;
         GoPreviousCommand.NotifyCanExecuteChanged();
         GoNextCommand.NotifyCanExecuteChanged();
+        ExportPdfCommand.NotifyCanExecuteChanged();
+        PrintCommand.NotifyCanExecuteChanged();
     }
 
     private bool CanGoPrevious() => CurrentIndex > 0;
@@ -142,5 +149,55 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (CanGoNext())
             CurrentIndex++;
+    }
+
+    private bool CanExportOrPrint() => CurrentInvoice is not null;
+
+    [RelayCommand(CanExecute = nameof(CanExportOrPrint))]
+    private void ExportPdf()
+    {
+        if (CurrentInvoice is null)
+            return;
+
+        var suggested = string.IsNullOrEmpty(CurrentInvoice.SeriesCode)
+            ? $"Factura_{CurrentInvoice.InvoiceNumber}.pdf"
+            : $"Factura_{CurrentInvoice.SeriesCode}_{CurrentInvoice.InvoiceNumber}.pdf";
+
+        try
+        {
+            var path = _pdf.SaveInvoicePdf(CurrentInvoice, suggested);
+            if (path is not null)
+                _dialogs.ShowInfo("Exportación completada", $"La factura se ha guardado en:\n{path}");
+        }
+        catch (Exception ex)
+        {
+            _dialogs.ShowError("No se pudo exportar el PDF", ex.Message);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExportOrPrint))]
+    private async Task Print()
+    {
+        if (CurrentInvoice is null)
+            return;
+
+        string? tempPath = null;
+        try
+        {
+            tempPath = _pdf.CreateTempPdf(CurrentInvoice);
+            var preview = new PdfPreviewWindow(tempPath) { Owner = System.Windows.Application.Current.MainWindow };
+            preview.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            _dialogs.ShowError("No se pudo preparar la impresión", ex.Message);
+        }
+        finally
+        {
+            if (tempPath is not null)
+            {
+                try { File.Delete(tempPath); } catch (IOException) { }
+            }
+        }
     }
 }

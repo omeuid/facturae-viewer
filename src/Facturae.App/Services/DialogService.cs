@@ -27,4 +27,7 @@ public sealed class DialogService : IDialogService
 
     public void ShowError(string title, string message)
         => MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+
+    public void ShowInfo(string title, string message)
+        => MessageBox.Show(Application.Current.MainWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Information);
 }

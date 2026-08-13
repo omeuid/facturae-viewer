@@ -45,6 +45,15 @@
                             ToolTip="Factura siguiente" Width="32" FontSize="16" />
                 </StackPanel>
 
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,16,0">
+                    <Button Content="Exportar a PDF…" Command="{Binding ExportPdfCommand}"
+                            Padding="14,5" Margin="0,0,8,0"
+                            ToolTip="Guardar la factura actual como documento PDF" />
+                    <Button Content="Imprimir…" Command="{Binding PrintCommand}"
+                            Padding="14,5"
+                            ToolTip="Vista previa e impresión de la factura actual" />
+                </StackPanel>
+
                 <TextBlock Text="{Binding FileName}" Foreground="White"
                            FontWeight="SemiBold" FontSize="14"
                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
