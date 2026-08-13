@@ -1,0 +1,21 @@
+# Build artifacts
+bin/
+obj/
+artifacts/
+*.user
+
+# Rider / Visual Studio
+.vs/
+.idea/
+
+# Publish output
+publish/
+*.exe
+!installer/**
+
+# Instalador
+installer/*.exe
+
+# Test results
+TestResults/
+*.trx

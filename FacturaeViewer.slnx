@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Facturae.App/Facturae.App.csproj" />
+    <Project Path="src/Facturae.Core/Facturae.Core.csproj" />
+    <Project Path="src/Facturae.Tests/Facturae.Tests.csproj" />
+  </Folder>
+</Solution>

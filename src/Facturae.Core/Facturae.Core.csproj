@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Núcleo de FacturaE Viewer: parseo, validación XSD, validación de firma y reglas de negocio. Sin dependencias de UI.</Description>
+    <RootNamespace>FacturaeViewer.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Schemas\*.xsd">
+      <LogicalName>FacturaeViewer.Core.Schemas.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

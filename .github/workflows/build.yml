@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test-publish:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Test
+        run: dotnet test -c Release --no-build
+
+      - name: Publish portable (win-x64)
+        run: dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish
+
+      - name: Upload artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: FacturaeViewer-win-x64
+          path: artifacts/publish/FacturaeViewer.exe
+
+# El paso de instalador (Inno Setup / iscc) se añadirá en la fase 7 (ver docs/PLAN.md).

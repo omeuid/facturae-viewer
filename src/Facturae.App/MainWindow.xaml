@@ -1,0 +1,12 @@
+<Window x:Class="Facturae.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Visor de FacturaE"
+        Height="600" Width="900"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <TextBlock Text="Visor de FacturaE"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   FontSize="28" FontWeight="SemiBold" />
+    </Grid>
+</Window>
