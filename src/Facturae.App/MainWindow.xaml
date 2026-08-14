@@ -13,6 +13,7 @@
         <conv:StatusToBrushConverter x:Key="StatusToBrush" />
         <conv:StatusToGlyphConverter x:Key="StatusToGlyph" />
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
+        <conv:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVis" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
