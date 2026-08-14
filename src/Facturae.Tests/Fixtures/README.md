@@ -29,6 +29,16 @@ tipos impositivos 2 decimales y `UnitOfMeasure` usa el código
 (`01` unidades, `02` horas). Se han omitido `RegistrationData` y
 `ContactDetails` (opcionales) por simplicidad.
 
+- `Facturae-3.1-firmada-real.xsig.xml` es una factura real firmada con
+  XAdES (firma de un particular con DNIe, formato FacturaE 3.1, año 2010),
+  publicada por el Centro de Transferencia de Tecnología del Gobierno de
+  España (repo `ctt-gob-es/clienteafirma`, fichero de ejemplo
+  `sample-facturae-firmada.xsig.xml`). Se usa para comprobar que la
+  verificación de firma funciona con firmas reales y no solo con las
+  generadas en tests: la firma pasa la validación (SIG-02), con avisos por
+  usar SHA-1 (SIG-04) y por no poder validar la cadena de confianza del
+  DNIe de 2010 (SIG-10, caducado y sin raíz instalada).
+
 - Los fixtures `*-incorrecto.xml` / `-invalido.xml` son mutaciones
   deliberadas del fixture válido 3.2.2 para ejercitar los validadores:
   - `Facturae-3.2.2-totales-incorrectos.xml`: `InvoiceTotal` = 99,99

@@ -171,7 +171,7 @@ internal static class TestSignature
                      .Cast<XmlElement>().ToList())
             sig.ParentNode!.RemoveChild(sig);
         var contentTransform = new XmlDsigC14NTransform(false);
-        contentTransform.LoadInput(working.DocumentElement!.SelectNodes(". | .//* | .//text()")!);
+        contentTransform.LoadInput(working.DocumentElement!.SelectNodes(". | .//* | .//@* | .//text()")!);
         using var contentStream = (Stream)contentTransform.GetOutput(typeof(Stream));
         using var contentMemory = new MemoryStream();
         contentStream.CopyTo(contentMemory);
@@ -180,7 +180,7 @@ internal static class TestSignature
         // 2) Digest de SignedProperties: elemento canonizado con C14N.
         var signedPropsEl = xml.SelectSingleNode("//*[local-name()='SignedProperties']")!;
         var propsC14N = new XmlDsigC14NTransform(false);
-        propsC14N.LoadInput(signedPropsEl.SelectNodes(". | .//* | .//text()")!);
+        propsC14N.LoadInput(signedPropsEl.SelectNodes(". | .//* | .//@* | .//text()")!);
         using var propsStream = (Stream)propsC14N.GetOutput(typeof(Stream));
         using var propsMemory = new MemoryStream();
         propsStream.CopyTo(propsMemory);
@@ -189,7 +189,7 @@ internal static class TestSignature
         // 3) Firma RSA sobre SignedInfo canonizado.
         var signedInfoEl = xml.SelectSingleNode("//*[local-name()='SignedInfo']")!;
         var signedInfoTransform = new XmlDsigC14NTransform(false);
-        signedInfoTransform.LoadInput(signedInfoEl.SelectNodes(". | .//* | .//text()")!);
+        signedInfoTransform.LoadInput(signedInfoEl.SelectNodes(". | .//* | .//@* | .//text()")!);
         using var signedInfoStream = (Stream)signedInfoTransform.GetOutput(typeof(Stream));
         using var signedInfoMemory = new MemoryStream();
         signedInfoStream.CopyTo(signedInfoMemory);

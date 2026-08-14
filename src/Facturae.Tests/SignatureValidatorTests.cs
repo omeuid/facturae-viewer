@@ -130,4 +130,45 @@ public class SignatureValidatorTests
 
         Assert.DoesNotContain(report.Checks, c => c.Code == "SIG-04");
     }
+
+    [Fact]
+    public void Firma_real_de_facturae_gob_es_valida_pasa_la_validacion()
+    {
+        var report = SignatureValidator.Validate(LoadFixture("Facturae-3.1-firmada-real.xsig.xml"));
+
+        Assert.False(report.HasErrors, string.Join("\n", report.Checks.Select(c => c.ToString())));
+        Assert.Contains(report.Checks, c => c.Code == "SIG-02" && c.Status == CheckStatus.Passed);
+        Assert.Contains(report.Checks, c => c.Code == "SIG-06" && c.Status == CheckStatus.Info);
+        Assert.Contains(report.Checks, c => c.Code == "SIG-11" && c.Status == CheckStatus.Passed);
+    }
+
+    [Fact]
+    public void Firma_real_con_contenido_manipulado_genera_error_SIG03()
+    {
+        var xml = LoadFixture("Facturae-3.1-firmada-real.xsig.xml");
+
+        var total = xml.SelectSingleNode("//*[local-name()='TotalAmount']")!;
+        total.InnerText = "666.00";
+
+        var report = SignatureValidator.Validate(xml);
+
+        Assert.True(report.HasErrors, string.Join("\n", report.Checks.Select(c => c.ToString())));
+        Assert.Contains(report.Checks, c => c.Code == "SIG-03" && c.Status == CheckStatus.Error);
+    }
+
+    [Fact]
+    public void Firma_real_con_algortimo_SHA1_genera_aviso_SIG04()
+    {
+        var report = SignatureValidator.Validate(LoadFixture("Facturae-3.1-firmada-real.xsig.xml"));
+
+        Assert.Contains(report.Checks, c => c.Code == "SIG-04" && c.Status == CheckStatus.Warning);
+    }
+
+    [Fact]
+    public void Firma_real_con_cadena_no_confiable_genera_aviso_SIG10()
+    {
+        var report = SignatureValidator.Validate(LoadFixture("Facturae-3.1-firmada-real.xsig.xml"));
+
+        Assert.Contains(report.Checks, c => c.Code == "SIG-10" && c.Status == CheckStatus.Warning);
+    }
 }
