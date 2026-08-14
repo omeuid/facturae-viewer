@@ -35,7 +35,7 @@ jobs:
         run: dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish
 
       - name: Upload artefacto portable
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: FacturaeViewer-win-x64
           path: artifacts/publish/FacturaeViewer.exe
@@ -51,7 +51,7 @@ jobs:
         run: iscc installer/setup.iss
 
       - name: Upload artefacto instalador
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: FacturaeViewer-Setup
           path: artifacts/installer/FacturaeViewer-Setup.exe
