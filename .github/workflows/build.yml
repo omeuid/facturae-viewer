@@ -40,11 +40,12 @@ jobs:
           name: FacturaeViewer-win-x64
           path: artifacts/publish/FacturaeViewer.exe
 
-      - name: Instalar Inno Setup
+      - name: Asegurar Inno Setup (preinstalado en el runner)
         shell: pwsh
         run: |
-          choco install innosetup -y --no-progress
-          iscc /VERSION
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) {
+            choco install innosetup -y --no-progress
+          }
 
       - name: Compilar instalador
         shell: pwsh
