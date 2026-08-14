@@ -4,6 +4,7 @@
 // You may obtain a copy of the License at
 //     http://www.apache.org/licenses/LICENSE-2.0
 
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -22,6 +23,7 @@ public partial class PdfPreviewWindow : Window
 {
     private readonly string _pdfPath;
     private IReadOnlyList<PdfPageImage> _pages = [];
+    private double _scale = 1.0;
 
     public PdfPreviewWindow(string pdfPath)
     {
@@ -39,6 +41,9 @@ public partial class PdfPreviewWindow : Window
             foreach (var page in _pages)
                 PagesPanel.Children.Add(CreatePageView(page));
 
+            PageScroller.SizeChanged += OnPageScrollerSizeChanged;
+            RecomputeScale();
+
             PrintButton.IsEnabled = _pages.Count > 0;
             StatusText.Text = $"{_pages.Count} página(s)";
         }
@@ -46,6 +51,34 @@ public partial class PdfPreviewWindow : Window
         {
             StatusText.Text = "No se pudo mostrar la vista previa.";
             MessageBox.Show(this, ex.Message, "Vista previa", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void OnPageScrollerSizeChanged(object sender, SizeChangedEventArgs e) => RecomputeScale();
+
+    /// <summary>
+    /// Ajusta el zoom de las páginas para que todo el folio quepa en el área
+    /// visible del ScrollViewer, sin necesidad de redimensionar la ventana.
+    /// </summary>
+    private void RecomputeScale()
+    {
+        if (_pages.Count == 0 || PagesPanel.Children.Count == 0)
+            return;
+
+        var maxWidth = _pages.Max(p => p.WidthDip);
+        var maxHeight = _pages.Max(p => p.HeightDip);
+        var availWidth = PageScroller.ViewportWidth - 32;
+        var availHeight = PageScroller.ViewportHeight - 16;
+
+        var scale = Math.Min(1.0, availWidth > 0 ? availWidth / maxWidth : 1.0);
+        scale = Math.Min(scale, availHeight > 0 ? availHeight / maxHeight : scale);
+        _scale = scale > 0 ? scale : 1.0;
+
+        var transform = _scale < 1.0 ? new ScaleTransform(_scale, _scale) : Transform.Identity;
+        foreach (var child in PagesPanel.Children)
+        {
+            if (child is Border page)
+                page.LayoutTransform = transform;
         }
     }
 
