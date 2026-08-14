@@ -2,9 +2,8 @@
 
 ## Estado del repositorio
 Proyecto nuevo en scaffolding. Ya existe `LICENSE` (Apache 2.0),
-`.github/workflows/opencode.yml`, `docs/PLAN.md` (plan de implementación
-acordado) y la estructura base de la solución. El README y el instalador
-aún no están terminados.
+`docs/PLAN.md` (plan de implementación acordado) y la estructura base de
+la solución. El README y el instalador aún no están terminados.
 
 ## Decisiones de diseño acordadas (no renegociar sin el usuario)
 - App de escritorio Windows para visualizar/validar facturas electrónicas
@@ -25,9 +24,7 @@ aún no están terminados.
 - Licencia del repo: Apache 2.0 (mantener en todos los archivos nuevos).
 
 ## Quirks
-- `.github/workflows/opencode.yml` se dispara solo con comentarios de
-  issue/PR que contengan `/oc` o `/opencode`; NO es CI de build/test.
-  El CI real es `.github/workflows/build.yml`.
+- El CI real es `.github/workflows/build.yml`.
 - El usuario trabaja en español: respuestas y mensajes de commit en español.
 - `Directory.Build.props` centraliza la configuración común (target
   `net10.0-windows`, nullable, WPF habilitado solo donde se necesita).

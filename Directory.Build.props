@@ -12,7 +12,7 @@
     <TargetFramework>net10.0</TargetFramework>
 
     <!-- Metadatos del paquete/repo. -->
-    <Version>0.1.0</Version>
+    <Version>1.0.0</Version>
     <Authors>Facturae Viewer contributors</Authors>
     <Product>Facturae Viewer</Product>
     <Copyright>Copyright (c) 2026 Facturae Viewer contributors</Copyright>
