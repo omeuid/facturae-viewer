@@ -15,10 +15,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -35,7 +35,7 @@ jobs:
         run: dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish
 
       - name: Upload artefacto portable
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: FacturaeViewer-win-x64
           path: artifacts/publish/FacturaeViewer.exe
@@ -51,14 +51,14 @@ jobs:
         run: iscc installer/setup.iss
 
       - name: Upload artefacto instalador
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: FacturaeViewer-Setup
           path: artifacts/installer/FacturaeViewer-Setup.exe
 
       - name: Crear release (solo tags v*)
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.2.0
         with:
           files: |
             artifacts/publish/FacturaeViewer.exe
