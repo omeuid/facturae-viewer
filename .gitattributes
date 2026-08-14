@@ -1,0 +1,11 @@
+* text=auto eol=lf
+
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.xsig binary
+*.xpsig binary
+*.p7m binary
