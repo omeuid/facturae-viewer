@@ -106,6 +106,14 @@ public static class SignatureValidator
     /// </summary>
     private static bool? CheckWithSignedXml(XmlDocument xml, XmlElement signature)
     {
+        // SignedXml de .NET no implementa el transform XAdES SignedProperties
+        // (http://uri.etsi.org/01903#SignedProperties). Con firmas XAdES reales
+        // devuelve false en lugar de lanzar una excepción, así que hay que
+        // detectarlo y delegar en la verificación manual para no dar un falso
+        // negativo con firmas correctas.
+        if (FindDescendants(signature, "Reference").Any(IsSignedPropertiesReference))
+            return null;
+
         try
         {
             var signedXml = new SignedXml(xml);
@@ -345,8 +353,9 @@ public static class SignatureValidator
     }
 
     private static bool IsSignedPropertiesReference(XmlElement reference)
-        => FindDescendants(reference, "Transform")
-            .Any(t => t.GetAttribute("Algorithm") == SignedPropertiesTransform);
+        => reference.GetAttribute("Type") == SignedPropertiesTransform
+            || FindDescendants(reference, "Transform")
+                .Any(t => t.GetAttribute("Algorithm") == SignedPropertiesTransform);
 
     private static byte[] Canonicalize(XmlNode node, string algorithm)
     {
@@ -354,11 +363,12 @@ public static class SignatureValidator
             ? new XmlDsigExcC14NTransform()
             : new XmlDsigC14NTransform(false);
 
-        // La canonización debe cubrir todo el subárbol del nodo (elemento y
-        // descendientes), no solo el propio nodo: C14N solo serializa los
-        // nodos que pertenecen al conjunto.
+        // La canonización debe cubrir todo el subárbol del nodo (elemento,
+        // descendientes y sus atributos), no solo el propio nodo: C14N solo
+        // serializa los nodos que pertenecen al conjunto. Los atributos deben
+        // incluirse explícitamente en el node-set o se pierden.
         var root = node is XmlDocument document ? document.DocumentElement! : node;
-        transform.LoadInput(root.SelectNodes(". | .//* | .//text()")!);
+        transform.LoadInput(root.SelectNodes(". | .//* | .//@* | .//text()")!);
 
         using var output = (Stream)transform.GetOutput(typeof(Stream));
         using var memory = new MemoryStream();
