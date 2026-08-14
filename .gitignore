@@ -7,6 +7,11 @@ artifacts/
 # Rider / Visual Studio
 .vs/
 .idea/
+*.suo
+
+# Sistema
+Thumbs.db
+.DS_Store
 
 # Publish output
 publish/
