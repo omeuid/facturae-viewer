@@ -67,6 +67,9 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isDragOver;
 
+    /// <summary>Índice de la factura mostrada en la navegación, en base 1 (0 cuando no hay documento).</summary>
+    public int CurrentDisplayIndex => TotalInvoices > 0 ? CurrentIndex + 1 : 0;
+
     /// <summary>Rutas recientes (cadenas escapadas) mostradas en el menú.</summary>
     public IList<string> RecentFiles { get; set; } = new ObservableCollection<string>();
 
@@ -133,6 +136,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     partial void OnCurrentIndexChanged(int value) => UpdateCurrentInvoice();
 
+    partial void OnTotalInvoicesChanged(int value) => OnPropertyChanged(nameof(CurrentDisplayIndex));
+
     /// <summary>
     /// Asigna la factura actual según el índice y refresca los comandos.
     /// Se llama también desde Load/Reset porque asignar un índice repetido
@@ -141,6 +146,7 @@ public sealed partial class MainViewModel : ObservableObject
     private void UpdateCurrentInvoice()
     {
         CurrentInvoice = _invoices.Count > CurrentIndex ? _invoices[CurrentIndex] : null;
+        OnPropertyChanged(nameof(CurrentDisplayIndex));
         GoPreviousCommand.NotifyCanExecuteChanged();
         GoNextCommand.NotifyCanExecuteChanged();
         ExportPdfCommand.NotifyCanExecuteChanged();
