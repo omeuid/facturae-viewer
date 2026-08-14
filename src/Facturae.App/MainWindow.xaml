@@ -69,7 +69,7 @@
 
                         <TextBlock Text="{Binding FileName}" Foreground="White"
                                    FontWeight="SemiBold" FontSize="14"
-                                   Margin="18,0,0,0"
+                                   Margin="10,0,0,0"
                                    VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     </DockPanel>
                 </Border>
@@ -391,15 +391,14 @@
             <!-- Panel de validación -->
             <Border Grid.Column="1" Background="#FFF0F0F0" BorderThickness="1,0,0,0" BorderBrush="#FFD0D0D0">
                 <DockPanel>
-                    <Border DockPanel.Dock="Top" Background="#FF2B2B2B" Padding="12,10">
+                    <Border DockPanel.Dock="Top" Background="#FF2B2B2B" Padding="12,12">
                         <StackPanel>
-                            <DockPanel>
-                                <TextBlock Text="{Binding DocumentStateText}" FontSize="19" FontWeight="SemiBold"
-                                           Foreground="{Binding OverallStatus, Converter={StaticResource StatusToBrush}}" />
-                                <TextBlock Text="Validación" DockPanel.Dock="Left" FontSize="11" FontWeight="Bold"
-                                           Foreground="#FF9E9E9E" VerticalAlignment="Top" Margin="14,3,0,0" />
-                            </DockPanel>
-                            <TextBlock Text="{Binding SummaryText}" Foreground="#FFD0D0D0" FontSize="12" Margin="0,4,0,0" />
+                            <TextBlock Text="Validación" FontSize="10" FontWeight="Bold"
+                                       Foreground="#FF9E9E9E" />
+                            <TextBlock Text="{Binding DocumentStateText}" FontSize="21" FontWeight="SemiBold"
+                                       Foreground="{Binding OverallStatus, Converter={StaticResource StatusToBrush}}"
+                                       Margin="0,3,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding SummaryText}" Foreground="#FFD0D0D0" FontSize="12" Margin="0,6,0,0" />
                         </StackPanel>
                     </Border>
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="8">
