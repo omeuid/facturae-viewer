@@ -6,8 +6,13 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>Facturae.App</RootNamespace>
     <AssemblyName>FacturaeViewer</AssemblyName>
+    <ApplicationIcon>Assets\App.ico</ApplicationIcon>
     <Description>Visor y validador de facturas electrónicas FacturaE (.xsig).</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\App.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />

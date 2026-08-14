@@ -7,6 +7,7 @@
         MinHeight="500" MinWidth="800"
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
+        Icon="Assets/App.ico"
         FontFamily="Segoe UI" FontSize="13">
 
     <Window.Resources>
@@ -27,7 +28,7 @@
         <!-- Barra de menús y herramientas -->
         <Border Grid.Row="0" Background="#FF3F3F46" Padding="0">
             <StackPanel>
-                <Menu Background="Transparent" Foreground="White" Padding="4,2">
+                <Menu Background="#FFFFFFFF" Foreground="#FF1E1E1E" Padding="4,2">
                     <MenuItem Header="Archivo">
                         <MenuItem Header="Abrir…" Command="{Binding OpenCommand}" />
                         <MenuItem Header="Salir" Click="ExitMenu_Click" />
