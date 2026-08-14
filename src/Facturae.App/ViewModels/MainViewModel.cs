@@ -105,6 +105,7 @@ public sealed partial class MainViewModel : ObservableObject
             RefreshRecentFiles();
 
             CurrentIndex = 0;
+            UpdateCurrentInvoice();
             return true;
         }
         catch (Exception ex) when (ex is FacturaeParseException or IOException or UnauthorizedAccessException)
@@ -119,7 +120,6 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _invoices = new List<InvoiceDisplay>();
         Checks = new ObservableCollection<ValidationCheck>();
-        CurrentInvoice = null;
         FileName = string.Empty;
         SchemaVersion = string.Empty;
         DocumentStateText = "Sin documento";
@@ -128,13 +128,19 @@ public sealed partial class MainViewModel : ObservableObject
         HasDocument = false;
         TotalInvoices = 0;
         CurrentIndex = 0;
-        ExportPdfCommand.NotifyCanExecuteChanged();
-        PrintCommand.NotifyCanExecuteChanged();
+        UpdateCurrentInvoice();
     }
 
-    partial void OnCurrentIndexChanged(int value)
+    partial void OnCurrentIndexChanged(int value) => UpdateCurrentInvoice();
+
+    /// <summary>
+    /// Asigna la factura actual según el índice y refresca los comandos.
+    /// Se llama también desde Load/Reset porque asignar un índice repetido
+    /// (p. ej. 0 → 0) no dispara OnCurrentIndexChanged.
+    /// </summary>
+    private void UpdateCurrentInvoice()
     {
-        CurrentInvoice = _invoices.Count > value ? _invoices[value] : null;
+        CurrentInvoice = _invoices.Count > CurrentIndex ? _invoices[CurrentIndex] : null;
         GoPreviousCommand.NotifyCanExecuteChanged();
         GoNextCommand.NotifyCanExecuteChanged();
         ExportPdfCommand.NotifyCanExecuteChanged();
