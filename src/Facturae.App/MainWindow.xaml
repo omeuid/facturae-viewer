@@ -97,9 +97,8 @@
             <!-- Factura visual -->
             <ScrollViewer Grid.Column="0" Background="#FFF7F7F7"
                           VerticalScrollBarVisibility="Auto"
-                          Visibility="{Binding HasDocument, Converter={StaticResource BoolToVis}}"
-                          DataContext="{Binding CurrentInvoice}">
-                <StackPanel Margin="28,20">
+                          Visibility="{Binding HasDocument, Converter={StaticResource BoolToVis}}">
+                <StackPanel Margin="28,20" DataContext="{Binding CurrentInvoice}">
 
                     <!-- Cabecera -->
                     <Border Background="White" Padding="20,16" CornerRadius="6"
