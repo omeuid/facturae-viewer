@@ -59,7 +59,7 @@ jobs:
 
       - name: Crear release (solo tags v*)
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2.2.0
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             artifacts/publish/FacturaeViewer.exe
