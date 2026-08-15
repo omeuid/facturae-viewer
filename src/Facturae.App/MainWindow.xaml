@@ -435,7 +435,10 @@
         </StatusBar>
 
         <!-- Superposición de arrastre -->
-        <Border Grid.Row="1" Background="#B8FFFFFF"
+        <!-- IsHitTestVisible=False: evita que el overlay altere el hit-test bajo
+             el ratón durante el arrastre y provoque DragEnter/DragLeave alternados
+             (parpadeo del recuadro). -->
+        <Border Grid.Row="1" Background="#B8FFFFFF" IsHitTestVisible="False"
                 Visibility="{Binding IsDragOver, Converter={StaticResource BoolToVis}}">
             <Border BorderBrush="#FF2E7D32" BorderThickness="3" CornerRadius="10"
                     Background="#EEFFFFFF" Margin="24">

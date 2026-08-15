@@ -72,4 +72,17 @@ public class FacturaeLoaderTests
         Assert.Throws<FileNotFoundException>(() =>
             FacturaeLoader.Load(Fixture("no-existe.xml")));
     }
+
+    [Fact]
+    public void Carga_fixture_31_informando_que_la_version_no_esta_soportada()
+    {
+        var ex = Assert.Throws<FacturaeParseException>(() =>
+            FacturaeLoader.Load(Fixture("Facturae-3.1-firmada-real.xsig.xml")));
+
+        Assert.Contains("3.1", ex.Message);
+        Assert.Contains("no está soportado", ex.Message);
+        Assert.Contains("3.2", ex.Message);
+        Assert.Contains("3.2.1", ex.Message);
+        Assert.Contains("3.2.2", ex.Message);
+    }
 }

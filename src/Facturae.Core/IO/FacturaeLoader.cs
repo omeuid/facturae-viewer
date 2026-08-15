@@ -90,6 +90,13 @@ public static class FacturaeLoader
         if (schemaVersion is not null && NamespaceByVersion.ContainsKey(schemaVersion))
             return schemaVersion;
 
+        // La versión se conoce pero no está soportada por esta aplicación.
+        var detected = schemaVersion is null ? rootNamespace : schemaVersion;
+        if (detected.StartsWith("3.", StringComparison.Ordinal))
+            throw new FacturaeParseException(
+                $"El documento usa el formato FacturaE {detected}, que no está soportado por esta aplicación. " +
+                $"Versiones soportadas: {string.Join(", ", NamespaceByVersion.Keys)}.");
+
         throw new FacturaeParseException(
             "No se pudo determinar la versión del formato FacturaE (espacio de nombres y SchemaVersion desconocidos).");
     }
