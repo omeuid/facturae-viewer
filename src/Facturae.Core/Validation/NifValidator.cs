@@ -55,7 +55,8 @@ public static class NifValidator
 
         if (taxId is null || string.IsNullOrWhiteSpace(taxId.TaxIdentificationNumber))
         {
-            report.AddWarning("NIF", $"El {rol} ({nombre}) no declara un número de identificación fiscal.");
+            report.AddWarning("NIF", $"El {rol} ({nombre}) no declara un número de identificación fiscal.",
+                targetElement: "TaxIdentification");
             return;
         }
 
@@ -70,7 +71,8 @@ public static class NifValidator
             status == CheckStatus.Passed
                 ? $"El NIF del {rol} ({taxId.TaxIdentificationNumber.Trim()}) tiene un formato válido."
                 : $"El NIF del {rol} ({taxId.TaxIdentificationNumber.Trim()}) no es válido.",
-            detail);
+            detail,
+            targetElement: "TaxIdentification");
     }
 
     private static (CheckStatus, string?) Evaluate(TaxIdentification taxId, string countryCode)

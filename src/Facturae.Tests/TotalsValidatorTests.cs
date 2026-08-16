@@ -47,4 +47,14 @@ public class TotalsValidatorTests
         Assert.True(report.HasErrors);
         Assert.Contains(report.Checks, c => c.Code == "TOT-06" && c.Status == CheckStatus.Error);
     }
+
+    [Fact]
+    public void Los_errores_de_totales_apuntan_al_elemento_InvoiceTotals()
+    {
+        var doc = FacturaeLoader.Load(Fixture("Facturae-3.2.2-totales-incorrectos.xml"));
+        var report = TotalsValidator.Validate(doc);
+
+        var check = Assert.Single(report.Checks, c => c.Code == "TOT-06" && c.Status == CheckStatus.Error);
+        Assert.Equal("InvoiceTotals", check.TargetElement);
+    }
 }

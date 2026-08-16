@@ -39,7 +39,8 @@ public class BusinessRulesValidatorTests
         var doc = FacturaeLoader.Parse(xml);
         var report = BusinessRulesValidator.Validate(doc);
 
-        Assert.Contains(report.Checks, c => c.Code == "FEC" && c.Status == CheckStatus.Error);
+        var check = Assert.Single(report.Checks, c => c.Code == "FEC" && c.Status == CheckStatus.Error);
+        Assert.Equal("InvoiceIssueData", check.TargetElement);
     }
 
     [Fact]

@@ -60,7 +60,8 @@ public static class TotalsValidator
             decimal totalCost = line.Quantity * line.UnitPriceWithoutTax;
             if (line.Quantity != 0 && !Approx(totalCost, line.TotalCost, LineTolerance))
             {
-                report.AddError("TOT-LINE-01", $"En {linea} de {id} el coste total ({line.TotalCost:0.######}) no coincide con cantidad × precio ({totalCost:0.######}).");
+                report.AddError("TOT-LINE-01", $"En {linea} de {id} el coste total ({line.TotalCost:0.######}) no coincide con cantidad × precio ({totalCost:0.######}).",
+                    targetElement: "InvoiceLine");
                 continue;
             }
 
@@ -69,13 +70,15 @@ public static class TotalsValidator
             decimal gross = totalCost - discounts + charges;
 
             if (!Approx(gross, line.GrossAmount, LineTolerance))
-                report.AddError("TOT-LINE-02", $"En {linea} de {id} el importe bruto ({line.GrossAmount:0.######}) no coincide con el coste total menos descuentos más recargos ({gross:0.######}).");
+                report.AddError("TOT-LINE-02", $"En {linea} de {id} el importe bruto ({line.GrossAmount:0.######}) no coincide con el coste total menos descuentos más recargos ({gross:0.######}).",
+                    targetElement: "InvoiceLine");
         }
 
         var totals = invoice.InvoiceTotals;
         if (totals is null)
         {
-            report.AddError("TOT", $"La factura {id} no declara InvoiceTotals.");
+            report.AddError("TOT", $"La factura {id} no declara InvoiceTotals.",
+                targetElement: "InvoiceTotals");
             return;
         }
 
@@ -84,11 +87,13 @@ public static class TotalsValidator
             .Sum(l => l.GrossAmount);
 
         if (!Approx(grossSum, totals.TotalGrossAmount, MoneyTolerance))
-            report.AddError("TOT-01", $"En {id} la suma de los importes brutos de las líneas ({grossSum:0.00}) no coincide con TotalGrossAmount ({totals.TotalGrossAmount:0.00}).");
+            report.AddError("TOT-01", $"En {id} la suma de los importes brutos de las líneas ({grossSum:0.00}) no coincide con TotalGrossAmount ({totals.TotalGrossAmount:0.00}).",
+                targetElement: "InvoiceTotals");
 
         decimal beforeTaxes = totals.TotalGrossAmount - totals.TotalGeneralDiscounts + totals.TotalGeneralSurcharges;
         if (!Approx(beforeTaxes, totals.TotalGrossAmountBeforeTaxes, MoneyTolerance))
-            report.AddError("TOT-02", $"En {id} TotalGrossAmountBeforeTaxes ({totals.TotalGrossAmountBeforeTaxes:0.00}) no coincide con TotalGrossAmount − descuentos + recargos ({beforeTaxes:0.00}).");
+            report.AddError("TOT-02", $"En {id} TotalGrossAmountBeforeTaxes ({totals.TotalGrossAmountBeforeTaxes:0.00}) no coincide con TotalGrossAmount − descuentos + recargos ({beforeTaxes:0.00}).",
+                targetElement: "InvoiceTotals");
 
         // Cuotas repercutidas: base × tipo, y recargo de equivalencia por separado.
         foreach (var tax in invoice.TaxesOutputs ?? [])
@@ -99,7 +104,8 @@ public static class TotalsValidator
             decimal baseImponible = tax.TaxableBase?.TotalAmount ?? 0m;
             decimal expected = baseImponible * tax.TaxRate / 100m;
             if (!Approx(expected, tax.TaxAmount.TotalAmount, MoneyTolerance))
-                report.AddError("TOT-03", $"En {id} la cuota de {tax.TaxTypeCode} ({tax.TaxAmount.TotalAmount:0.00}) no coincide con base {baseImponible:0.00} × tipo {tax.TaxRate:0.00}% ({expected:0.00}).");
+                report.AddError("TOT-03", $"En {id} la cuota de {tax.TaxTypeCode} ({tax.TaxAmount.TotalAmount:0.00}) no coincide con base {baseImponible:0.00} × tipo {tax.TaxRate:0.00}% ({expected:0.00}).",
+                    targetElement: "InvoiceTotals");
         }
 
         decimal taxOutputSum = (invoice.TaxesOutputs ?? [])
@@ -107,25 +113,29 @@ public static class TotalsValidator
             .Sum(t => (t.TaxAmount?.TotalAmount ?? 0m) + (t.EquivalenceSurchargeAmount?.TotalAmount ?? 0m));
 
         if (!Approx(taxOutputSum, totals.TotalTaxOutputs, MoneyTolerance))
-            report.AddError("TOT-04", $"En {id} la suma de cuotas repercutidas y recargo de equivalencia ({taxOutputSum:0.00}) no coincide con TotalTaxOutputs ({totals.TotalTaxOutputs:0.00}).");
+            report.AddError("TOT-04", $"En {id} la suma de cuotas repercutidas y recargo de equivalencia ({taxOutputSum:0.00}) no coincide con TotalTaxOutputs ({totals.TotalTaxOutputs:0.00}).",
+                targetElement: "InvoiceTotals");
 
         decimal withheldSum = (invoice.TaxesWithheld ?? [])
             .Where(t => t is not null)
             .Sum(t => t.TaxAmount?.TotalAmount ?? 0m);
 
         if (!Approx(withheldSum, totals.TotalTaxesWithheld, MoneyTolerance))
-            report.AddError("TOT-05", $"En {id} la suma de cuotas retenidas ({withheldSum:0.00}) no coincide con TotalTaxesWithheld ({totals.TotalTaxesWithheld:0.00}).");
+            report.AddError("TOT-05", $"En {id} la suma de cuotas retenidas ({withheldSum:0.00}) no coincide con TotalTaxesWithheld ({totals.TotalTaxesWithheld:0.00}).",
+                targetElement: "InvoiceTotals");
 
         decimal invoiceTotal = totals.TotalGrossAmountBeforeTaxes + totals.TotalTaxOutputs - totals.TotalTaxesWithheld;
         if (!Approx(invoiceTotal, totals.InvoiceTotal, MoneyTolerance))
-            report.AddError("TOT-06", $"En {id} el importe total ({totals.InvoiceTotal:0.00}) no coincide con bruto + repercutidas − retenidas ({invoiceTotal:0.00}).");
+            report.AddError("TOT-06", $"En {id} el importe total ({totals.InvoiceTotal:0.00}) no coincide con bruto + repercutidas − retenidas ({invoiceTotal:0.00}).",
+                targetElement: "InvoiceTotals");
 
         // Si no hay pagos anticipados, el pendiente debe coincidir con el total.
         if (totals.TotalPaymentsOnAccount == 0m)
         {
             decimal outstanding = totals.InvoiceTotal - totals.TotalPaymentsOnAccount;
             if (!Approx(outstanding, totals.TotalOutstandingAmount, MoneyTolerance))
-                report.AddWarning("TOT-07", $"En {id} el importe pendiente ({totals.TotalOutstandingAmount:0.00}) no coincide con el total ({outstanding:0.00}).");
+                report.AddWarning("TOT-07", $"En {id} el importe pendiente ({totals.TotalOutstandingAmount:0.00}) no coincide con el total ({outstanding:0.00}).",
+                    targetElement: "InvoiceTotals");
         }
     }
 
@@ -134,21 +144,25 @@ public static class TotalsValidator
         if (fileHeader?.Batch is null)
         {
             if (fileHeader?.Modality == "I" && invoices.Length > 1)
-                report.AddError("TOT-08", $"La modalidad es individual (I) pero el documento contiene {invoices.Length} facturas.");
+                report.AddError("TOT-08", $"La modalidad es individual (I) pero el documento contiene {invoices.Length} facturas.",
+                    targetElement: "Batch");
             return;
         }
 
         var batch = fileHeader.Batch;
         if (batch.InvoicesCount != invoices.Length)
-            report.AddError("TOT-08", $"El lote declara {batch.InvoicesCount} facturas pero contiene {invoices.Length}.");
+            report.AddError("TOT-08", $"El lote declara {batch.InvoicesCount} facturas pero contiene {invoices.Length}.",
+                targetElement: "Batch");
 
         decimal sum = invoices.Sum(i => i.InvoiceTotals?.InvoiceTotal ?? 0m);
         decimal batchTotal = batch.TotalInvoicesAmount?.TotalAmount ?? 0m;
         if (!Approx(sum, batchTotal, MoneyTolerance))
-            report.AddError("TOT-09", $"La suma de los importes de las facturas ({sum:0.00}) no coincide con el total del lote ({batchTotal:0.00}).");
+            report.AddError("TOT-09", $"La suma de los importes de las facturas ({sum:0.00}) no coincide con el total del lote ({batchTotal:0.00}).",
+                targetElement: "Batch");
 
         if (string.IsNullOrWhiteSpace(batch.BatchIdentifier))
-            report.AddWarning("TOT-10", "El lote no declara un identificador de lote (BatchIdentifier).");
+            report.AddWarning("TOT-10", "El lote no declara un identificador de lote (BatchIdentifier).",
+                targetElement: "Batch");
     }
 
     private static bool Approx(decimal a, decimal b, decimal tolerance)

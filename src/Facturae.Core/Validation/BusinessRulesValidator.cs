@@ -139,7 +139,8 @@ public static class BusinessRulesValidator
 
         if (issue is null)
         {
-            report.AddWarning("FEC", $"En {id} la fecha de emisión no tiene un formato ISO 8601 válido.");
+            report.AddWarning("FEC", $"En {id} la fecha de emisión no tiene un formato ISO 8601 válido.",
+                targetElement: "InvoiceIssueData");
             return;
         }
 
@@ -150,7 +151,8 @@ public static class BusinessRulesValidator
         {
             report.AddError("FEC",
                 $"En {id} la fecha de operación ({invoice.InvoiceIssueData!.OperationDate}) es posterior a la de emisión " +
-                $"({invoice.InvoiceIssueData.IssueDate}).");
+                $"({invoice.InvoiceIssueData.IssueDate}).",
+                targetElement: "InvoiceIssueData");
         }
     }
 
@@ -172,7 +174,8 @@ public static class BusinessRulesValidator
             string code = codigo.Trim().ToUpperInvariant();
             if (!IsoCurrencyCodes.Contains(code))
                 report.AddError("COD",
-                    $"En {id} el código de moneda {campo} ({codigo.Trim()}) no es un código ISO 4217 válido.");
+                    $"En {id} el código de moneda {campo} ({codigo.Trim()}) no es un código ISO 4217 válido.",
+                    targetElement: campo);
         }
     }
 
@@ -207,7 +210,8 @@ public static class BusinessRulesValidator
 
         if (!IsoCountryCodes.Contains(code))
             report.AddWarning("COD",
-                $"El país del {rol} ({country.Trim()}) no es un código ISO 3166-1 alfa-3 válido.");
+                $"El país del {rol} ({country.Trim()}) no es un código ISO 3166-1 alfa-3 válido.",
+                targetElement: "CountryCode");
     }
 
     /// <summary>La provincia del {rol} debe ser un código o nombre válido de España.</summary>
@@ -226,7 +230,8 @@ public static class BusinessRulesValidator
         if (SpanishProvinces.ContainsKey(p) || SpanishProvinces.Values.Any(v => v.Equals(p, StringComparison.OrdinalIgnoreCase)))
             return;
 
-        report.AddWarning("COD", $"La provincia del {rol} ({province.Trim()}) no corresponde a una provincia española.");
+        report.AddWarning("COD", $"La provincia del {rol} ({province.Trim()}) no corresponde a una provincia española.",
+            targetElement: "Province");
     }
 
     /// <summary>Los descuentos/cargos de una línea no pueden superar su coste total.</summary>
@@ -238,24 +243,29 @@ public static class BusinessRulesValidator
             : $"línea \"{line.ItemDescription.Trim()}\"";
 
         if (line.Quantity < 0 || line.UnitPriceWithoutTax < 0 || line.TotalCost < 0 || line.GrossAmount < 0)
-            report.AddError("LIN", $"En {id}, {descripcion}: las cantidades e importes no pueden ser negativos.");
+            report.AddError("LIN", $"En {id}, {descripcion}: las cantidades e importes no pueden ser negativos.",
+                targetElement: "InvoiceLine");
 
         foreach (var discount in line.DiscountsAndRebates ?? [])
         {
             if (discount.DiscountAmount < 0)
-                report.AddError("LIN", $"En {id}, {descripcion}: el importe del descuento no puede ser negativo.");
+                report.AddError("LIN", $"En {id}, {descripcion}: el importe del descuento no puede ser negativo.",
+                    targetElement: "InvoiceLine");
 
             if (discount.DiscountRate is < 0 or > 100)
-                report.AddError("LIN", $"En {id}, {descripcion}: el porcentaje de descuento ({discount.DiscountRate:0.##} %) debe estar entre 0 y 100.");
+                report.AddError("LIN", $"En {id}, {descripcion}: el porcentaje de descuento ({discount.DiscountRate:0.##} %) debe estar entre 0 y 100.",
+                    targetElement: "InvoiceLine");
         }
 
         foreach (var charge in line.Charges ?? [])
         {
             if (charge.ChargeAmount < 0)
-                report.AddError("LIN", $"En {id}, {descripcion}: el importe del cargo no puede ser negativo.");
+                report.AddError("LIN", $"En {id}, {descripcion}: el importe del cargo no puede ser negativo.",
+                    targetElement: "InvoiceLine");
 
             if (charge.ChargeRate is < 0 or > 100)
-                report.AddError("LIN", $"En {id}, {descripcion}: el porcentaje del cargo ({charge.ChargeRate:0.##} %) debe estar entre 0 y 100.");
+                report.AddError("LIN", $"En {id}, {descripcion}: el porcentaje del cargo ({charge.ChargeRate:0.##} %) debe estar entre 0 y 100.",
+                    targetElement: "InvoiceLine");
         }
 
         // El total de descuentos no puede dejar la línea en negativo.
@@ -263,7 +273,8 @@ public static class BusinessRulesValidator
         decimal charges = (line.Charges ?? []).Sum(c => c.ChargeAmount);
         decimal net = line.TotalCost - discounts + charges;
         if (net < 0)
-            report.AddError("LIN", $"En {id}, {descripcion}: los descuentos superan el coste total de la línea ({net:0.00}).");
+            report.AddError("LIN", $"En {id}, {descripcion}: los descuentos superan el coste total de la línea ({net:0.00}).",
+                targetElement: "InvoiceLine");
     }
 
     /// <summary>Intenta parsear una fecha ISO 8601 (YYYY-MM-DD o con hora).</summary>

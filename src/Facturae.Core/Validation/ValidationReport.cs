@@ -25,6 +25,13 @@ public enum CheckStatus
 /// <summary>Resultado de una comprobación individual de validación.</summary>
 public sealed record ValidationCheck(string Code, CheckStatus Status, string Message, string? Detail = null)
 {
+    /// <summary>
+    /// Nombre local del elemento XML que origina la comprobación (p. ej.
+    /// "InvoiceTotals"). Lo usa la interfaz para navegar al nodo en la
+    /// pestaña XML. Null si no hay un elemento concreto asociado.
+    /// </summary>
+    public string? TargetElement { get; init; }
+
     public override string ToString() => $"[{Status}] {Code}: {Message}";
 }
 
@@ -47,17 +54,17 @@ public sealed class ValidationReport
 
     public int PassedCount => Checks.Count(c => c.Status == CheckStatus.Passed);
 
-    public void Add(string code, CheckStatus status, string message, string? detail = null)
-        => Checks.Add(new ValidationCheck(code, status, message, detail));
+    public void Add(string code, CheckStatus status, string message, string? detail = null, string? targetElement = null)
+        => Checks.Add(new ValidationCheck(code, status, message, detail) { TargetElement = targetElement });
 
-    public void AddPassed(string code, string message, string? detail = null)
-        => Add(code, CheckStatus.Passed, message, detail);
+    public void AddPassed(string code, string message, string? detail = null, string? targetElement = null)
+        => Add(code, CheckStatus.Passed, message, detail, targetElement);
 
-    public void AddWarning(string code, string message, string? detail = null)
-        => Add(code, CheckStatus.Warning, message, detail);
+    public void AddWarning(string code, string message, string? detail = null, string? targetElement = null)
+        => Add(code, CheckStatus.Warning, message, detail, targetElement);
 
-    public void AddError(string code, string message, string? detail = null)
-        => Add(code, CheckStatus.Error, message, detail);
+    public void AddError(string code, string message, string? detail = null, string? targetElement = null)
+        => Add(code, CheckStatus.Error, message, detail, targetElement);
 
     /// <summary>Fusiona los chequeos de otro informe en este.</summary>
     public void Merge(ValidationReport other)

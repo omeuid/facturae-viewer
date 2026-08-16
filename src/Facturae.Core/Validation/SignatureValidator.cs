@@ -77,12 +77,14 @@ public static class SignatureValidator
                 detail.Contains("manual", StringComparison.OrdinalIgnoreCase)
                     ? "La firma XMLDSig/XAdES se verificó correctamente (verificación manual de la referencia XAdES)."
                     : "La firma XMLDSig/XAdES se verificó correctamente.",
-                detail);
+                detail,
+                targetElement: "Signature");
         }
         else
         {
             report.AddError("SIG-03",
-                $"La firma no es válida: {detail}");
+                $"La firma no es válida: {detail}",
+                targetElement: "Signature");
         }
 
         ReportAlgorithmWarning(signature, report);
@@ -456,7 +458,8 @@ public static class SignatureValidator
         if (signatureMethod == RsaSha1 || usesSha1Digest)
         {
             report.AddWarning("SIG-04",
-                "La firma usa el algoritmo SHA-1 (deprecado). Se recomienda firmar con SHA-256.");
+                "La firma usa el algoritmo SHA-1 (deprecado). Se recomienda firmar con SHA-256.",
+                targetElement: "Signature");
         }
     }
 
@@ -467,31 +470,36 @@ public static class SignatureValidator
             return;
 
         report.Add("SIG-06", CheckStatus.Info,
-            $"El documento incluye una firma XAdES ({qualifyingProperties.NamespaceURI}).");
+            $"El documento incluye una firma XAdES ({qualifyingProperties.NamespaceURI}).",
+            targetElement: "Signature");
 
         var signingTime = xml.SelectSingleNode("//*[local-name()='SigningTime']")?.InnerText?.Trim();
         if (!string.IsNullOrEmpty(signingTime))
-            report.Add("SIG-07", CheckStatus.Info, $"Fecha y hora de firma declarada: {signingTime}.");
+            report.Add("SIG-07", CheckStatus.Info, $"Fecha y hora de firma declarada: {signingTime}.",
+                targetElement: "Signature");
 
         var policyIdentifier = xml.SelectSingleNode("//*[local-name()='SignaturePolicyIdentifier']");
         if (policyIdentifier is not null)
         {
             if (policyIdentifier.SelectSingleNode("*[local-name()='SignaturePolicyImplied']") is not null)
             {
-                report.Add("SIG-08", CheckStatus.Info, "Política de firma: implícita (SignaturePolicyImplied).");
+                report.Add("SIG-08", CheckStatus.Info, "Política de firma: implícita (SignaturePolicyImplied).",
+                    targetElement: "Signature");
             }
             else
             {
                 string? policyId = policyIdentifier.SelectSingleNode(
                     "descendant::*[local-name()='Identifier']")?.InnerText?.Trim();
                 report.Add("SIG-08", CheckStatus.Info,
-                    $"Política de firma: {policyId ?? "(sin identificador)"}.");
+                    $"Política de firma: {policyId ?? "(sin identificador)"}.",
+                    targetElement: "Signature");
             }
         }
 
         var claimedRole = xml.SelectSingleNode("//*[local-name()='ClaimedRole']")?.InnerText?.Trim();
         if (!string.IsNullOrEmpty(claimedRole))
-            report.Add("SIG-09", CheckStatus.Info, $"Rol declarado: {claimedRole}.");
+            report.Add("SIG-09", CheckStatus.Info, $"Rol declarado: {claimedRole}.",
+                targetElement: "Signature");
 
         VerifySigningCertificateDigest(xml, signature, report);
     }
@@ -525,12 +533,14 @@ public static class SignatureValidator
         if (actual.SequenceEqual(expected))
         {
             report.AddPassed("SIG-11",
-                "El certificado firmante declarado en XAdES coincide con el de la firma.");
+                "El certificado firmante declarado en XAdES coincide con el de la firma.",
+                targetElement: "Signature");
         }
         else
         {
             report.AddError("SIG-11",
-                "El certificado firmante declarado en XAdES no coincide con el de la firma.");
+                "El certificado firmante declarado en XAdES no coincide con el de la firma.",
+                targetElement: "Signature");
         }
     }
 
@@ -540,7 +550,8 @@ public static class SignatureValidator
         if (cert is null)
         {
             report.AddWarning("SIG-10",
-                "No se encontró un certificado en la firma para validar la cadena de confianza.");
+                "No se encontró un certificado en la firma para validar la cadena de confianza.",
+                targetElement: "Signature");
             return;
         }
 
@@ -550,7 +561,8 @@ public static class SignatureValidator
         if (validated)
         {
             report.AddPassed("SIG-10",
-                $"Cadena de confianza verificada con comprobación de revocación (OCSP/CRL). Certificado: {subject}.");
+                $"Cadena de confianza verificada con comprobación de revocación (OCSP/CRL). Certificado: {subject}.",
+                targetElement: "Signature");
             return;
         }
 
@@ -559,13 +571,15 @@ public static class SignatureValidator
         {
             report.AddPassed("SIG-10",
                 $"Cadena de confianza verificada (sin comprobación de revocación por falta de red). Certificado: {subject}.",
-                onlineDetail);
+                onlineDetail,
+                targetElement: "Signature");
             return;
         }
 
         report.AddWarning("SIG-10",
             $"La cadena de confianza no se pudo validar ({offlineDetail}); el estado de revocación queda no verificado. Certificado: {subject}.",
-            onlineDetail);
+            onlineDetail,
+            targetElement: "Signature");
     }
 
     private static bool TryBuildChain(X509Certificate2 cert, X509RevocationMode revocationMode, out string detail)
