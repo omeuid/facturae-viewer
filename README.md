@@ -6,11 +6,15 @@ Windows 10/11. Permite abrir ficheros `.xsig` (facturas firmadas), `.xpsig` y `.
 interfaz clara y exportarlas a PDF o imprimirlas.
 
 > **Estado:** completo (7/7 fases — ver [`docs/PLAN.md`](docs/PLAN.md)).
+>
+> **Uso:** guía con capturas en [`docs/USO.md`](docs/USO.md).
 
-## Características (objetivo)
+![Ventana principal del visor con una factura válida](docs/images/ventana-principal.png)
+
+## Características
 
 - Apertura por doble clic de ficheros `.xsig`, `.xpsig` y `.xml` (asociación de archivo).
-- Validación del esquema XSD oficial (versiones 3.2, 3.2.1 y 3.2.2).
+- Validación del esquema XSD oficial (versiones 3.1, 3.2, 3.2.1 y 3.2.2).
 - Validación de firma XMLDSig/XAdES y de la cadena de confianza del certificado.
 - Reglas de negocio: formato NIF/NIE/CIF y coherencia de totales e impuestos.
 - Soporte de lotes (varias facturas por fichero).
@@ -90,6 +94,8 @@ src/Facturae.App/     Cliente WPF (Views, ViewModels, Services)
 src/Facturae.Tests/   Tests xUnit
 installer/            Instalador Inno Setup (setup.iss)
 docs/PLAN.md          Plan de implementación
+docs/USO.md           Guía de uso con capturas
+docs/images/          Capturas de la aplicación
 ```
 
 ## Licencia
