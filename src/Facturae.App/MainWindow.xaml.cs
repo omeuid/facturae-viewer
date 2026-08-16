@@ -6,6 +6,7 @@
 
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Facturae.App.Services;
 using Facturae.App.ViewModels;
 
@@ -26,6 +27,28 @@ public partial class MainWindow : Window
             if (e.PropertyName == nameof(MainViewModel.RecentFiles))
                 RefreshRecentsMenu();
         };
+        viewModel.XmlScrollToLine += ScrollToXmlLine;
+    }
+
+    /// <summary>
+    /// Muestra la pestaña «XML» ya seleccionada, desplaza el cuadro hasta la
+    /// línea del elemento (base 0) y la selecciona para resaltar el nodo.
+    /// </summary>
+    private void ScrollToXmlLine(int line)
+    {
+        Dispatcher.InvokeAsync(() =>
+        {
+            if (XmlTextBox.Text.Length == 0)
+                return;
+
+            int safe = Math.Clamp(line, 0, XmlTextBox.LineCount - 1);
+            int start = XmlTextBox.GetCharacterIndexFromLineIndex(safe);
+            int length = XmlTextBox.GetLineLength(safe);
+
+            XmlTextBox.ScrollToLine(safe);
+            XmlTextBox.Focus();
+            XmlTextBox.Select(start, Math.Max(0, length));
+        }, DispatcherPriority.Background);
     }
 
     private void RefreshRecentsMenu()

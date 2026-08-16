@@ -15,6 +15,7 @@
         <conv:StatusToGlyphConverter x:Key="StatusToGlyph" />
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
         <conv:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVis" />
+        <conv:NullToVisibilityConverter x:Key="NullToVis" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
@@ -97,6 +98,7 @@
 
             <!-- Factura visual y XML -->
             <TabControl Grid.Column="0" Background="#FFF7F7F7"
+                        SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
                         Visibility="{Binding HasDocument, Converter={StaticResource BoolToVis}}">
                 <TabItem Header="Factura">
                     <ScrollViewer Background="#FFF7F7F7"
@@ -391,7 +393,7 @@
                     </ScrollViewer>
                 </TabItem>
                 <TabItem Header="XML">
-                    <TextBox Text="{Binding RawXml, Mode=OneWay}" IsReadOnly="True"
+                    <TextBox x:Name="XmlTextBox" Text="{Binding RawXml, Mode=OneWay}" IsReadOnly="True"
                              FontFamily="Consolas" FontSize="12"
                              Background="#FFFFFFFF" Foreground="#FF1E1E1E"
                              BorderThickness="0" Padding="12"
@@ -417,7 +419,17 @@
                     <ItemsControl ItemsSource="{Binding Checks}" Margin="8">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#33FFFFFF" CornerRadius="4" Padding="8,6" Margin="0,3">
+                                <Button Background="#33FFFFFF" BorderThickness="0" Padding="8,6" Margin="0,3"
+                                        HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+                                        Command="{Binding DataContext.NavigateToCheckCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Cursor="Hand"
+                                        ToolTip="Ver el nodo en la pestaña XML">
+                                    <Button.Resources>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent" />
+                                        </Style>
+                                    </Button.Resources>
                                     <DockPanel>
                                         <TextBlock Text="{Binding Status, Converter={StaticResource StatusToGlyph}}"
                                                    DockPanel.Dock="Left" FontWeight="Bold" Width="20"
@@ -427,8 +439,11 @@
                                                    Foreground="{Binding Status, Converter={StaticResource StatusToBrush}}" />
                                         <TextBlock Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"
                                                    Foreground="#FF333333" />
+                                        <TextBlock Text="▸" DockPanel.Dock="Right" Foreground="#FF2E7D32"
+                                                   FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                   Visibility="{Binding TargetElement, Converter={StaticResource NullToVis}}" />
                                     </DockPanel>
-                                </Border>
+                                </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

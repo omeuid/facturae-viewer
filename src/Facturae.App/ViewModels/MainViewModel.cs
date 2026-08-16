@@ -47,6 +47,12 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _rawXml = string.Empty;
 
+    /// <summary>Índice de línea (base 0) de cada elemento del XML formateado, por nombre local.</summary>
+    private IReadOnlyDictionary<string, int> _xmlElementLines = new Dictionary<string, int>();
+
+    [ObservableProperty]
+    private int _selectedTabIndex;
+
     [ObservableProperty]
     private string _schemaVersion = string.Empty;
 
@@ -97,6 +103,7 @@ public sealed partial class MainViewModel : ObservableObject
             Checks = new ObservableCollection<ValidationCheck>(report.Checks);
             FileName = Path.GetFileName(path);
             RawXml = FormatXml(document.Xml);
+            _xmlElementLines = IndexElementLines(RawXml);
             SchemaVersion = $"FacturaE {document.SchemaVersion}";
             TotalInvoices = _invoices.Count;
             HasDocument = true;
@@ -130,6 +137,7 @@ public sealed partial class MainViewModel : ObservableObject
         Checks = new ObservableCollection<ValidationCheck>();
         FileName = string.Empty;
         RawXml = string.Empty;
+        _xmlElementLines = new Dictionary<string, int>();
         SchemaVersion = string.Empty;
         DocumentStateText = "Sin documento";
         SummaryText = "Arrastre un fichero .xsig, .xpsig o .xml aquí o use «Abrir…».";
@@ -249,6 +257,26 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Cambia a la pestaña «XML» y desplaza el cursor al elemento que origina
+    /// un chequeo de validación, si se conoce.
+    /// </summary>
+    [RelayCommand]
+    private void NavigateToCheck(ValidationCheck check)
+    {
+        if (check?.TargetElement is null || !HasDocument)
+            return;
+
+        if (_xmlElementLines.TryGetValue(check.TargetElement, out int line))
+        {
+            SelectedTabIndex = 1;
+            XmlScrollToLine?.Invoke(line);
+        }
+    }
+
+    /// <summary>Petición de la vista para desplazarse a una línea del XML (base 0).</summary>
+    public event Action<int>? XmlScrollToLine;
+
+    /// <summary>
     /// Serializa el documento XML con indentación legible para mostrarlo en la
     /// pestaña «XML». Se parte del OuterXml para descartar el whitespace
     /// original (el documento cargado preserva el formato del fichero).
@@ -270,5 +298,30 @@ public sealed partial class MainViewModel : ObservableObject
         using (var writer = XmlWriter.Create(sw, settings))
             clean.Save(writer);
         return sw.ToString();
+    }
+
+    /// <summary>
+    /// Calcula la línea (base 0) en el XML formateado donde empieza cada
+    /// elemento, indexada por su nombre local. Último ganador: en documentos
+    /// con elementos repetidos (p. ej. varios Invoice) se guarda el último.
+    /// </summary>
+    private static IReadOnlyDictionary<string, int> IndexElementLines(string xml)
+    {
+        var lines = new Dictionary<string, int>();
+        if (string.IsNullOrWhiteSpace(xml))
+            return lines;
+
+        var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit };
+        using var reader = XmlReader.Create(new StringReader(xml), settings);
+        if (reader is not System.Xml.IXmlLineInfo lineInfo || !lineInfo.HasLineInfo())
+            return lines;
+
+        while (reader.Read())
+        {
+            if (reader.NodeType == XmlNodeType.Element)
+                lines.TryAdd(reader.LocalName, lineInfo.LineNumber - 1);
+        }
+
+        return lines;
     }
 }
