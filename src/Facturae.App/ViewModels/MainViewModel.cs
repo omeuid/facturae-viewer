@@ -6,6 +6,7 @@
 
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Xml;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Facturae.App.Services;
@@ -42,6 +43,9 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private string _fileName = string.Empty;
+
+    [ObservableProperty]
+    private string _rawXml = string.Empty;
 
     [ObservableProperty]
     private string _schemaVersion = string.Empty;
@@ -92,6 +96,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             Checks = new ObservableCollection<ValidationCheck>(report.Checks);
             FileName = Path.GetFileName(path);
+            RawXml = FormatXml(document.Xml);
             SchemaVersion = $"FacturaE {document.SchemaVersion}";
             TotalInvoices = _invoices.Count;
             HasDocument = true;
@@ -124,6 +129,7 @@ public sealed partial class MainViewModel : ObservableObject
         _invoices = new List<InvoiceDisplay>();
         Checks = new ObservableCollection<ValidationCheck>();
         FileName = string.Empty;
+        RawXml = string.Empty;
         SchemaVersion = string.Empty;
         DocumentStateText = "Sin documento";
         SummaryText = "Arrastre un fichero .xsig, .xpsig o .xml aquí o use «Abrir…».";
@@ -240,5 +246,29 @@ public sealed partial class MainViewModel : ObservableObject
     {
         _recent.RemoveAll();
         RefreshRecentFiles();
+    }
+
+    /// <summary>
+    /// Serializa el documento XML con indentación legible para mostrarlo en la
+    /// pestaña «XML». Se parte del OuterXml para descartar el whitespace
+    /// original (el documento cargado preserva el formato del fichero).
+    /// </summary>
+    private static string FormatXml(XmlDocument xml)
+    {
+        var clean = new XmlDocument { PreserveWhitespace = false };
+        clean.LoadXml(xml.OuterXml);
+
+        var settings = new XmlWriterSettings
+        {
+            Indent = true,
+            IndentChars = "  ",
+            OmitXmlDeclaration = true,
+            NewLineChars = Environment.NewLine,
+        };
+
+        using var sw = new StringWriter();
+        using (var writer = XmlWriter.Create(sw, settings))
+            clean.Save(writer);
+        return sw.ToString();
     }
 }

@@ -95,11 +95,13 @@
                            MaxWidth="420" Foreground="#FF757575" />
             </StackPanel>
 
-            <!-- Factura visual -->
-            <ScrollViewer Grid.Column="0" Background="#FFF7F7F7"
-                          VerticalScrollBarVisibility="Auto"
-                          Visibility="{Binding HasDocument, Converter={StaticResource BoolToVis}}">
-                <StackPanel Margin="28,20" DataContext="{Binding CurrentInvoice}">
+            <!-- Factura visual y XML -->
+            <TabControl Grid.Column="0" Background="#FFF7F7F7"
+                        Visibility="{Binding HasDocument, Converter={StaticResource BoolToVis}}">
+                <TabItem Header="Factura">
+                    <ScrollViewer Background="#FFF7F7F7"
+                                  VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="28,20" DataContext="{Binding CurrentInvoice}">
 
                     <!-- Cabecera -->
                     <Border Background="White" Padding="20,16" CornerRadius="6"
@@ -386,7 +388,18 @@
                         </StackPanel>
                     </Border>
                 </StackPanel>
-            </ScrollViewer>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="XML">
+                    <TextBox Text="{Binding RawXml, Mode=OneWay}" IsReadOnly="True"
+                             FontFamily="Consolas" FontSize="12"
+                             Background="#FFFFFFFF" Foreground="#FF1E1E1E"
+                             BorderThickness="0" Padding="12"
+                             VerticalScrollBarVisibility="Auto"
+                             HorizontalScrollBarVisibility="Auto"
+                             TextWrapping="NoWrap" />
+                </TabItem>
+            </TabControl>
 
             <!-- Panel de validación -->
             <Border Grid.Column="1" Background="#FFF0F0F0" BorderThickness="1,0,0,0" BorderBrush="#FFD0D0D0">
