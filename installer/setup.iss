@@ -38,6 +38,17 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename:
 
 ; --- Asociación de ficheros en HKCU (sin admin) ---
 [Registry]
+; Registro en "Abrir con...": sin esta clave, Explorer no muestra la app ni su
+; icono en el diálogo "Abrir con...". Windows resuelve el icono desde
+; Applications\<exe>\DefaultIcon y el comando desde shell\open\command.
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}"; ValueType: string; ValueName: "FriendlyAppName"; ValueData: "{#AppName}"
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName},0"
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#AppExeName}"" ""%1"""
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}\SupportedTypes"; ValueType: string; ValueName: ".xsig"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}\SupportedTypes"; ValueType: string; ValueName: ".xpsig"; ValueData: ""
+Root: HKCU; Subkey: "Software\Classes\Applications\{#AppExeName}\SupportedTypes"; ValueType: string; ValueName: ".xml"; ValueData: ""
+
 Root: HKCU; Subkey: "Software\Classes\.xsig"; ValueType: string; ValueName: ""; ValueData: "FacturaeViewer.xsig"; Flags: uninsdeletevalue
 Root: HKCU; Subkey: "Software\Classes\FacturaeViewer.xsig"; ValueType: string; ValueName: ""; ValueData: "Factura electrónica FacturaE (firmada)"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\FacturaeViewer.xsig\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{#AppExeName},0"
