@@ -22,6 +22,7 @@ public static class DocumentValidator
         report.Merge(NifValidator.Validate(document));
         report.Merge(TotalsValidator.Validate(document));
         report.Merge(SignatureValidator.Validate(document));
+        report.Merge(BusinessRulesValidator.Validate(document));
         return report;
     }
 }
