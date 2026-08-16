@@ -7,17 +7,18 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace Facturae.App.Converters;
 
 /// <summary>
-/// Convierte una referencia no nula en <see cref="Visibility.Visible"/> y
-/// null en <see cref="Visibility.Collapsed"/>.
+/// Convierte un booleano en cursor: true → <see cref="Cursors.Hand"/>,
+/// false → <see cref="Cursors.Arrow"/>.
 /// </summary>
-public sealed class NullToVisibilityConverter : IValueConverter
+public sealed class BoolToCursorConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is not null ? Visibility.Visible : Visibility.Collapsed;
+        => value is true ? Cursors.Hand : Cursors.Arrow;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();

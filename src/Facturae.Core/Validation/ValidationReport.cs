@@ -32,6 +32,14 @@ public sealed record ValidationCheck(string Code, CheckStatus Status, string Mes
     /// </summary>
     public string? TargetElement { get; init; }
 
+    /// <summary>
+    /// Indica si el chequeo admite navegación al nodo XML que lo origina:
+    /// solo cuando hay un elemento asociado y el resultado no es correcto
+    /// (error o aviso). Los chequeos correctos no deben ser navegables.
+    /// </summary>
+    public bool CanNavigate
+        => TargetElement is not null && Status is CheckStatus.Error or CheckStatus.Warning;
+
     public override string ToString() => $"[{Status}] {Code}: {Message}";
 }
 

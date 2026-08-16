@@ -263,10 +263,10 @@ public sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void NavigateToCheck(ValidationCheck check)
     {
-        if (check?.TargetElement is null || !HasDocument)
+        if (check is null || !check.CanNavigate || !HasDocument)
             return;
 
-        if (_xmlElementLines.TryGetValue(check.TargetElement, out int line))
+        if (check.TargetElement is string target && _xmlElementLines.TryGetValue(target, out int line))
         {
             SelectedTabIndex = 1;
             XmlScrollToLine?.Invoke(line);

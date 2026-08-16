@@ -99,4 +99,13 @@ public class BusinessRulesValidatorTests
         Assert.True(idx >= 0, $"No se encontró '{search}' en el fixture.");
         return xml.Remove(idx, search.Length).Insert(idx, replace);
     }
+
+    [Fact]
+    public void Solo_los_chequeos_con_error_o_aviso_son_navegables()
+    {
+        var doc = FacturaeLoader.Load(Fixture("Facturae-3.2.2-valid.xml"));
+        var report = BusinessRulesValidator.Validate(doc);
+
+        Assert.All(report.Checks, c => Assert.False(c.CanNavigate, $"{c.Code} no debería ser navegable."));
+    }
 }

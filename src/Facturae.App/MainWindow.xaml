@@ -15,7 +15,7 @@
         <conv:StatusToGlyphConverter x:Key="StatusToGlyph" />
         <conv:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
         <conv:GreaterThanZeroToVisibilityConverter x:Key="GreaterThanZeroToVis" />
-        <conv:NullToVisibilityConverter x:Key="NullToVis" />
+        <conv:BoolToCursorConverter x:Key="BoolToCursor" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
@@ -423,7 +423,7 @@
                                         HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
                                         Command="{Binding DataContext.NavigateToCheckCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                         CommandParameter="{Binding}"
-                                        Cursor="Hand"
+                                        Cursor="{Binding CanNavigate, Converter={StaticResource BoolToCursor}}"
                                         ToolTip="Ver el nodo en la pestaña XML">
                                     <Button.Resources>
                                         <Style TargetType="Border">
@@ -441,7 +441,7 @@
                                                    Foreground="#FF333333" />
                                         <TextBlock Text="▸" DockPanel.Dock="Right" Foreground="#FF2E7D32"
                                                    FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center"
-                                                   Visibility="{Binding TargetElement, Converter={StaticResource NullToVis}}" />
+                                                   Visibility="{Binding CanNavigate, Converter={StaticResource BoolToVis}}" />
                                     </DockPanel>
                                 </Button>
                             </DataTemplate>
