@@ -22,6 +22,7 @@ public static class SchemaValidator
     private static readonly string[] EmbeddedSchemas =
     [
         "xmldsig-core-schema.xsd",
+        "Facturaev3_1.xsd",
         "Facturaev3_2.xsd",
         "Facturaev3_2_1.xsd",
         "Facturaev3_2_2.xsd",

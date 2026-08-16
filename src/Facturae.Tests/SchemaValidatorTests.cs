@@ -29,6 +29,17 @@ public class SchemaValidatorTests
         Assert.Contains(report.Checks, c => c.Code == "SCHEMA" && c.Status == CheckStatus.Passed);
     }
 
+    [Fact]
+    public void Fixture_31_firmado_no_tiene_errores_de_esquema()
+    {
+        // El bloque XAdES genera avisos ("Could not find schema information")
+        // porque el XSD Facturae no define el namespace XAdES, pero nunca errores.
+        var doc = FacturaeLoader.Load(Fixture("Facturae-3.1-firmada-real.xsig.xml"));
+        var report = SchemaValidator.Validate(doc);
+
+        Assert.True(report.IsValid, string.Join("\n", report.Checks.Select(c => c.ToString())));
+    }
+
     [Theory]
     [InlineData("Facturae-3.2.2-totales-incorrectos.xml")]
     [InlineData("Facturae-3.2.2-nif-invalido.xml")]

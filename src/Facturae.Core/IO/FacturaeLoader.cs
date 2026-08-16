@@ -21,6 +21,7 @@ public static class FacturaeLoader
     public static readonly IReadOnlyDictionary<string, string> NamespaceByVersion =
         new Dictionary<string, string>
         {
+            ["3.1"] = FacturaeNamespaces.NamespaceV3_1,
             ["3.2"] = FacturaeNamespaces.NamespaceV3_2,
             ["3.2.1"] = FacturaeNamespaces.NamespaceV3_2_1,
             ["3.2.2"] = FacturaeNamespaces.NamespaceV3_2_2,

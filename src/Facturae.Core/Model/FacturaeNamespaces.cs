@@ -11,6 +11,9 @@ namespace FacturaeViewer.Core.Model;
 /// </summary>
 public static class FacturaeNamespaces
 {
+    /// <summary>Versión 3.1.</summary>
+    public const string NamespaceV3_1 = "http://www.facturae.es/Facturae/2007/v3.1/Facturae";
+
     /// <summary>Versión 3.2.</summary>
     public const string NamespaceV3_2 = "http://www.facturae.es/Facturae/2009/v3.2/Facturae";
 
