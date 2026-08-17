@@ -14,6 +14,7 @@ using Facturae.App.Views;
 using FacturaeViewer.Core.IO;
 using FacturaeViewer.Core.Model;
 using FacturaeViewer.Core.Validation;
+using FacturaeViewer.Core.Xml;
 
 namespace Facturae.App.ViewModels;
 
@@ -77,6 +78,9 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isDragOver;
 
+    [ObservableProperty]
+    private bool _isLoading;
+
     /// <summary>Índice de la factura mostrada en la navegación, en base 1 (0 cuando no hay documento).</summary>
     public int CurrentDisplayIndex => TotalInvoices > 0 ? CurrentIndex + 1 : 0;
 
@@ -94,16 +98,36 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Carga y valida un fichero FacturaE (usado por el botón, el CLI y el drag & drop).</summary>
     public bool Load(string path)
     {
+        _ = LoadAsync(path);
+        return true;
+    }
+
+    /// <summary>
+    /// Carga, valida y proyecta un fichero FacturaE en segundo plano para no
+    /// bloquear la interfaz con documentos grandes. Los resultados se aplican
+    /// al volver al hilo de UI.
+    /// </summary>
+    private async Task LoadAsync(string path)
+    {
+        if (IsLoading)
+            return;
+
+        IsLoading = true;
         try
         {
-            var document = FacturaeLoader.Load(path);
-            var report = DocumentValidator.Validate(document);
-            _invoices = FacturaeProjector.Project(document.Facturae);
+            var (document, report, invoices) = await Task.Run(() =>
+            {
+                var doc = FacturaeLoader.Load(path);
+                var rep = DocumentValidator.Validate(doc);
+                var inv = FacturaeProjector.Project(doc.Facturae);
+                return (doc, rep, inv);
+            });
 
+            _invoices = invoices;
             Checks = new ObservableCollection<ValidationCheck>(report.Checks);
             FileName = Path.GetFileName(path);
-            RawXml = FormatXml(document.Xml);
-            _xmlElementLines = IndexElementLines(RawXml);
+            RawXml = XmlFormatting.Format(document.Xml);
+            _xmlElementLines = XmlFormatting.IndexElementLines(RawXml);
             SchemaVersion = $"FacturaE {document.SchemaVersion}";
             TotalInvoices = _invoices.Count;
             HasDocument = true;
@@ -121,13 +145,15 @@ public sealed partial class MainViewModel : ObservableObject
 
             CurrentIndex = 0;
             UpdateCurrentInvoice();
-            return true;
         }
         catch (Exception ex) when (ex is FacturaeParseException or IOException or UnauthorizedAccessException)
         {
             Reset();
             _dialogs.ShowError("No se pudo abrir el fichero", ex.Message);
-            return false;
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
@@ -275,53 +301,4 @@ public sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Petición de la vista para desplazarse a una línea del XML (base 0).</summary>
     public event Action<int>? XmlScrollToLine;
-
-    /// <summary>
-    /// Serializa el documento XML con indentación legible para mostrarlo en la
-    /// pestaña «XML». Se parte del OuterXml para descartar el whitespace
-    /// original (el documento cargado preserva el formato del fichero).
-    /// </summary>
-    private static string FormatXml(XmlDocument xml)
-    {
-        var clean = new XmlDocument { PreserveWhitespace = false };
-        clean.LoadXml(xml.OuterXml);
-
-        var settings = new XmlWriterSettings
-        {
-            Indent = true,
-            IndentChars = "  ",
-            OmitXmlDeclaration = true,
-            NewLineChars = Environment.NewLine,
-        };
-
-        using var sw = new StringWriter();
-        using (var writer = XmlWriter.Create(sw, settings))
-            clean.Save(writer);
-        return sw.ToString();
-    }
-
-    /// <summary>
-    /// Calcula la línea (base 0) en el XML formateado donde empieza cada
-    /// elemento, indexada por su nombre local. Último ganador: en documentos
-    /// con elementos repetidos (p. ej. varios Invoice) se guarda el último.
-    /// </summary>
-    private static IReadOnlyDictionary<string, int> IndexElementLines(string xml)
-    {
-        var lines = new Dictionary<string, int>();
-        if (string.IsNullOrWhiteSpace(xml))
-            return lines;
-
-        var settings = new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit };
-        using var reader = XmlReader.Create(new StringReader(xml), settings);
-        if (reader is not System.Xml.IXmlLineInfo lineInfo || !lineInfo.HasLineInfo())
-            return lines;
-
-        while (reader.Read())
-        {
-            if (reader.NodeType == XmlNodeType.Element)
-                lines.TryAdd(reader.LocalName, lineInfo.LineNumber - 1);
-        }
-
-        return lines;
-    }
 }

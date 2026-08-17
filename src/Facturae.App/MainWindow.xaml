@@ -96,6 +96,14 @@
                            MaxWidth="420" Foreground="#FF757575" />
             </StackPanel>
 
+            <!-- Carga en curso -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+                <ProgressBar IsIndeterminate="True" Width="260" Height="6" Margin="0,0,0,10" />
+                <TextBlock Text="Abriendo y validando el documento…"
+                           FontSize="15" HorizontalAlignment="Center" Foreground="#FF616161" />
+            </StackPanel>
+
             <!-- Factura visual y XML -->
             <TabControl Grid.Column="0" Background="#FFF7F7F7"
                         SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
