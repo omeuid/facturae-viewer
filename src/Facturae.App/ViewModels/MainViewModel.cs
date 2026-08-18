@@ -43,6 +43,9 @@ public sealed partial class MainViewModel : ObservableObject
     private InvoiceDisplay? _currentInvoice;
 
     [ObservableProperty]
+    private SignatureDetails? _signature;
+
+    [ObservableProperty]
     private string _fileName = string.Empty;
 
     [ObservableProperty]
@@ -129,6 +132,7 @@ public sealed partial class MainViewModel : ObservableObject
             RawXml = XmlFormatting.Format(document.Xml);
             _xmlElementLines = XmlFormatting.IndexElementLines(RawXml);
             SchemaVersion = $"FacturaE {document.SchemaVersion}";
+            Signature = SignatureInspector.Inspect(document.Xml);
             TotalInvoices = _invoices.Count;
             HasDocument = true;
 
@@ -166,6 +170,7 @@ public sealed partial class MainViewModel : ObservableObject
         _xmlElementLines = new Dictionary<string, int>();
         SchemaVersion = string.Empty;
         DocumentStateText = "Sin documento";
+        Signature = null;
         SummaryText = "Arrastre un fichero .xsig, .xpsig o .xml aquí o use «Abrir…».";
         OverallStatus = CheckStatus.Info;
         HasDocument = false;

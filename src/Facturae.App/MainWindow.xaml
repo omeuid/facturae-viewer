@@ -397,6 +397,56 @@
                             </Grid>
                         </StackPanel>
                     </Border>
+
+                    <!-- Firma electrónica -->
+                    <Border Background="White" Padding="14,12" CornerRadius="6" Margin="0,12,0,0"
+                            BorderBrush="#FFDDDDDD" BorderThickness="1"
+                            DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}">
+                        <StackPanel>
+                            <TextBlock Text="Firma electrónica" FontSize="12" FontWeight="Bold"
+                                       Foreground="#FF757575" Margin="0,0,0,6" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Tipo"
+                                           Foreground="#FF757575" FontSize="11" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                           Text="{Binding Signature.TypeText, Mode=OneWay}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Fecha de firma"
+                                           Foreground="#FF757575" FontSize="11" Margin="0,4,0,0" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,4,0,0"
+                                           Text="{Binding Signature.SigningTime, Mode=OneWay}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Política"
+                                           Foreground="#FF757575" FontSize="11" Margin="0,4,0,0" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Margin="0,4,0,0"
+                                           Text="{Binding Signature.Policy, Mode=OneWay}" TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Rol"
+                                           Foreground="#FF757575" FontSize="11" Margin="0,4,0,0" />
+                                <TextBlock Grid.Row="3" Grid.Column="1" Margin="0,4,0,0"
+                                           Text="{Binding Signature.ClaimedRole, Mode=OneWay}" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Certificado"
+                                           Foreground="#FF757575" FontSize="11" Margin="0,4,0,0" />
+                                <TextBlock Grid.Row="4" Grid.Column="1" Margin="0,4,0,0"
+                                           Text="{Binding Signature.CertificateSubject, Mode=OneWay}"
+                                           TextWrapping="Wrap" />
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Validez"
+                                           Foreground="#FF757575" FontSize="11" Margin="0,4,0,0" />
+                                <TextBlock Grid.Row="5" Grid.Column="1" Margin="0,4,0,0"
+                                           Text="{Binding Signature.CertificateValidPeriod, Mode=OneWay}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
                     </ScrollViewer>
                 </TabItem>
