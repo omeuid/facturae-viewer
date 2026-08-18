@@ -27,13 +27,19 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly IDialogService _dialogs;
     private readonly IPdfService _pdf;
     private readonly RecentFilesService _recent;
+    private readonly IUpdateService _updates;
     private IReadOnlyList<InvoiceDisplay> _invoices = new List<InvoiceDisplay>();
 
-    public MainViewModel(IDialogService dialogs, IPdfService pdf, RecentFilesService? recent = null)
+    public MainViewModel(
+        IDialogService dialogs,
+        IPdfService pdf,
+        RecentFilesService? recent = null,
+        IUpdateService? updates = null)
     {
         _dialogs = dialogs;
         _pdf = pdf;
         _recent = recent ?? new RecentFilesService();
+        _updates = updates ?? new UpdateService();
     }
 
     [ObservableProperty]
@@ -306,4 +312,69 @@ public sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Petición de la vista para desplazarse a una línea del XML (base 0).</summary>
     public event Action<int>? XmlScrollToLine;
+
+    [ObservableProperty]
+    private bool _isCheckingUpdates;
+
+    /// <summary>
+    /// Comprueba si hay una versión más reciente de la aplicación. Muestra el
+    /// diálogo de actualización si existe, o un aviso de que está al día.
+    /// </summary>
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        if (IsCheckingUpdates)
+            return;
+
+        IsCheckingUpdates = true;
+        try
+        {
+            var release = await _updates.CheckForUpdatesAsync();
+            if (release is null)
+            {
+                _dialogs.ShowInfo("Sin actualizaciones",
+                    $"Ya tiene instalada la última versión ({_updates.CurrentVersion}).");
+                return;
+            }
+
+            var dialog = new UpdateDialog(_updates, release, _updates.CurrentVersion.ToString())
+            {
+                Owner = System.Windows.Application.Current.MainWindow,
+            };
+            dialog.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            _dialogs.ShowError("No se pudo comprobar actualizaciones",
+                "No se pudo contactar con el servidor de actualizaciones.\n\n" + ex.Message);
+        }
+        finally
+        {
+            IsCheckingUpdates = false;
+        }
+    }
+
+    /// <summary>
+    /// Comprobación silenciosa al arrancar: solo muestra el diálogo si hay una
+    /// actualización disponible. Los errores de red se ignoran.
+    /// </summary>
+    public async Task CheckForUpdatesSilentlyAsync()
+    {
+        try
+        {
+            var release = await _updates.CheckForUpdatesAsync();
+            if (release is null)
+                return;
+
+            var dialog = new UpdateDialog(_updates, release, _updates.CurrentVersion.ToString())
+            {
+                Owner = System.Windows.Application.Current.MainWindow,
+            };
+            dialog.ShowDialog();
+        }
+        catch (Exception)
+        {
+            // Silencioso: sin red no se molesta al usuario.
+        }
+    }
 }

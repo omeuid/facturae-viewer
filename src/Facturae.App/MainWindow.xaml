@@ -37,6 +37,10 @@
                     <MenuItem x:Name="RecentsMenu" Header="Recientes">
                         <MenuItem Header="(vacío)" IsEnabled="False" />
                     </MenuItem>
+                    <MenuItem Header="Ayuda">
+                        <MenuItem Header="Comprobar actualizaciones…"
+                                  Command="{Binding CheckForUpdatesCommand}" />
+                    </MenuItem>
                 </Menu>
                 <Border Padding="10,8">
                     <DockPanel>

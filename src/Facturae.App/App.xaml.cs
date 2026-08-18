@@ -68,6 +68,9 @@ public partial class App : Application
 
         if (fileArg is not null)
             _viewModel.Load(fileArg);
+
+        // Comprobación silenciosa de actualizaciones al arrancar.
+        _ = _viewModel.CheckForUpdatesSilentlyAsync();
     }
 
     protected override void OnExit(ExitEventArgs e)
