@@ -70,7 +70,7 @@ Requisito: [Inno Setup 6](https://jrsoftware.org/isdl.php) con `iscc` en el PATH
    iscc installer/setup.iss
    ```
 
-   El instalador se genera en `artifacts\installer\FacturaeViewer-Setup.exe`. Regístra
+   El instalador se genera en `artifacts\installer\FacturaeViewer-Setup-1.0.0.exe`. Regístra
    la asociación de archivos `.xsig`, `.xpsig` y `.xml` en `HKCU` (sin permisos de
    administrador) y crea los accesos directos.
 

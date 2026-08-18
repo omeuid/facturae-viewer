@@ -6,20 +6,36 @@
 #define AppExeName "FacturaeViewer.exe"
 #define AppVersion "1.0.0"
 #define Publisher "Facturae Viewer contributors"
+#define AppURL "https://github.com/omeuid/facturae-viewer"
 
 [Setup]
 AppId={{7D3F5C4E-2E1A-4F8B-9C6A-3D2B1A0E9F5C}
 AppName={#AppName}
+AppVerName={#AppName} {#AppVersion}
 AppVersion={#AppVersion}
 AppPublisher={#Publisher}
+AppPublisherURL={#AppURL}
+AppSupportURL={#AppURL}
 DefaultDirName={autopf}\FacturaeViewer
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
+CloseApplications=yes
+CloseApplicationsFilter={#AppExeName}
+AppMutex=Local\FacturaeViewer.SingleInstance
+MinVersion=10.0.17763
 OutputDir=..\artifacts\installer
-OutputBaseFilename=FacturaeViewer-Setup
+OutputBaseFilename=FacturaeViewer-Setup-{#AppVersion}
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile=..\src\Facturae.App\Assets\App.ico
+UninstallDisplayIcon={app}\{#AppExeName}
+LicenseFile=..\LICENSE
+VersionInfoVersion={#AppVersion}
+VersionInfoCompany={#Publisher}
+VersionInfoDescription={#AppName}
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
