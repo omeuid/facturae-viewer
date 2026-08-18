@@ -50,7 +50,8 @@ public sealed record ReleaseInfo(
                     continue;
 
                 string assetNameText = assetName.GetString() ?? string.Empty;
-                if (!assetNameText.EndsWith("-Setup.exe", StringComparison.OrdinalIgnoreCase))
+                if (!assetNameText.StartsWith("FacturaeViewer-Setup", StringComparison.OrdinalIgnoreCase) ||
+                    !assetNameText.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 installerUrl = asset.TryGetProperty("browser_download_url", out var downloadUrl)

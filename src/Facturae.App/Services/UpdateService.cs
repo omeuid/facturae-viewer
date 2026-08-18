@@ -15,7 +15,7 @@ namespace Facturae.App.Services;
 /// <summary>
 /// Comprueba actualizaciones consultando la API de releases de GitHub del
 /// repositorio omeuid/facturae-viewer y descarga el instalador
-/// (FacturaeViewer-Setup.exe) de la última release.
+/// (FacturaeViewer-Setup-&lt;versión&gt;.exe) de la última release.
 /// </summary>
 public sealed class UpdateService : IUpdateService
 {

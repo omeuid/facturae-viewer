@@ -62,8 +62,8 @@ public class ReleaseInfoTests
           "browser_download_url": "https://github.com/omeuid/facturae-viewer/releases/download/v1.1.0/FacturaeViewer.exe"
         },
         {
-          "name": "FacturaeViewer-Setup.exe",
-          "browser_download_url": "https://github.com/omeuid/facturae-viewer/releases/download/v1.1.0/FacturaeViewer-Setup.exe"
+          "name": "FacturaeViewer-Setup-1.1.0.exe",
+          "browser_download_url": "https://github.com/omeuid/facturae-viewer/releases/download/v1.1.0/FacturaeViewer-Setup-1.1.0.exe"
         }
       ]
     }
@@ -77,7 +77,7 @@ public class ReleaseInfoTests
         Assert.NotNull(release);
         Assert.Equal(new ReleaseVersion(1, 1, 0), release.Version);
         Assert.Contains("Mejora A", release.Notes);
-        Assert.Equal("https://github.com/omeuid/facturae-viewer/releases/download/v1.1.0/FacturaeViewer-Setup.exe",
+        Assert.Equal("https://github.com/omeuid/facturae-viewer/releases/download/v1.1.0/FacturaeViewer-Setup-1.1.0.exe",
             release.InstallerUrl);
         Assert.EndsWith("releases/tag/v1.1.0", release.HtmlUrl);
     }
