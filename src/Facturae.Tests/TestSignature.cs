@@ -14,8 +14,10 @@ namespace Facturae.Tests;
 /// <summary>
 /// Ayudante de pruebas para generar certificados autofirmados y firmar un
 /// documento FacturaE: firma XMLDSig pura (con SignedXml) y firma XAdES
-/// (con el transform oficial http://uri.etsi.org/01903#SignedProperties,
-/// que SignedXml de .NET no genera y se construye manualmente).
+/// (construida manualmente: referencia a SignedProperties con el atributo
+/// Type, como las firmas oficiales de facturae.gob.es). Las firmas generadas
+/// incluyen KeyValue (RSAKeyValue) y compactan el contenido, de modo que
+/// xmlsec, SignedXml y la verificación manual calculan el mismo digest.
 /// </summary>
 internal static class TestSignature
 {
@@ -46,6 +48,7 @@ internal static class TestSignature
     public static XmlDocument SignPlainXmlDsig(XmlDocument source, X509Certificate2 cert)
     {
         var xml = (XmlDocument)source.CloneNode(true);
+        RemoveWhitespaceOnlyTextNodes(xml);
 
         using var rsa = cert.GetRSAPrivateKey()!;
         var signedXml = new SignedXml(xml)
@@ -63,6 +66,22 @@ internal static class TestSignature
 
         var keyInfo = new KeyInfo();
         keyInfo.AddClause(new KeyInfoX509Data(cert));
+
+        // KeyValue (RSAKeyValue) además de X509Data, igual que las firmas
+        // oficiales de facturae.gob.es: xmlsec la necesita para localizar la clave.
+        var keyValueXml = new XmlDocument();
+        var rsaParams = rsa.ExportParameters(false);
+        var keyValueElement = keyValueXml.CreateElement("KeyValue", DsNs);
+        var rsaKeyValueElement = keyValueXml.CreateElement("RSAKeyValue", DsNs);
+        var modulusElement = keyValueXml.CreateElement("Modulus", DsNs);
+        modulusElement.InnerText = Convert.ToBase64String(rsaParams.Modulus!);
+        var exponentElement = keyValueXml.CreateElement("Exponent", DsNs);
+        exponentElement.InnerText = Convert.ToBase64String(rsaParams.Exponent!);
+        rsaKeyValueElement.AppendChild(modulusElement);
+        rsaKeyValueElement.AppendChild(exponentElement);
+        keyValueElement.AppendChild(rsaKeyValueElement);
+        keyInfo.AddClause(new KeyInfoNode(keyValueElement));
+
         signedXml.KeyInfo = keyInfo;
 
         signedXml.ComputeSignature();
@@ -74,6 +93,7 @@ internal static class TestSignature
     public static XmlDocument SignXades(XmlDocument source, X509Certificate2 cert)
     {
         var xml = (XmlDocument)source.CloneNode(true);
+        RemoveWhitespaceOnlyTextNodes(xml);
         using var rsa = cert.GetRSAPrivateKey()!;
 
         var signature = xml.CreateElement("ds", "Signature", DsNs);
@@ -94,14 +114,11 @@ internal static class TestSignature
         var contentReference = CreateReference(xml, "", DigestSha256, C14N, Enveloped);
         signedInfo.AppendChild(contentReference);
 
-        // Referencia XAdES a SignedProperties con el transform oficial.
+        // Referencia XAdES a SignedProperties: el fixture real usa el atributo
+        // Type en lugar del transform, que xmlsec no registra.
         var propsReference = xml.CreateElement("ds", "Reference", DsNs);
         propsReference.SetAttribute("URI", "#SignedProperties1");
-        var transforms = xml.CreateElement("ds", "Transforms", DsNs);
-        var propsTransform = xml.CreateElement("ds", "Transform", DsNs);
-        propsTransform.SetAttribute("Algorithm", SignedPropsTransform);
-        transforms.AppendChild(propsTransform);
-        propsReference.AppendChild(transforms);
+        propsReference.SetAttribute("Type", SignedPropsTransform);
         var propsDigestMethod = xml.CreateElement("ds", "DigestMethod", DsNs);
         propsDigestMethod.SetAttribute("Algorithm", DigestSha256);
         propsReference.AppendChild(propsDigestMethod);
@@ -113,6 +130,16 @@ internal static class TestSignature
         signature.AppendChild(signatureValue);
 
         var keyInfo = xml.CreateElement("ds", "KeyInfo", DsNs);
+        var keyValue = xml.CreateElement("ds", "KeyValue", DsNs);
+        var rsaKeyValue = xml.CreateElement("ds", "RSAKeyValue", DsNs);
+        var modulus = xml.CreateElement("ds", "Modulus", DsNs);
+        modulus.InnerText = Convert.ToBase64String(rsa.ExportParameters(false).Modulus!);
+        rsaKeyValue.AppendChild(modulus);
+        var exponent = xml.CreateElement("ds", "Exponent", DsNs);
+        exponent.InnerText = Convert.ToBase64String(rsa.ExportParameters(false).Exponent!);
+        rsaKeyValue.AppendChild(exponent);
+        keyValue.AppendChild(rsaKeyValue);
+        keyInfo.AppendChild(keyValue);
         var x509Data = xml.CreateElement("ds", "X509Data", DsNs);
         var certElement = xml.CreateElement("ds", "X509Certificate", DsNs);
         certElement.InnerText = Convert.ToBase64String(cert.RawData);
@@ -226,4 +253,17 @@ internal static class TestSignature
     private static void SetDigestValue(XmlElement reference, byte[] digest)
         => reference.SelectSingleNode("descendant::*[local-name()='DigestValue']")!.InnerText
             = Convert.ToBase64String(digest);
+
+    /// <summary>
+    /// Elimina los nodos de texto whitespace-only del árbol. SignedXml de .NET
+    /// excluye esos nodos al calcular el digest de la referencia, mientras que
+    /// xmlsec y la verificación manual (que incluye //text()) los tienen en
+    /// cuenta; compactar el contenido antes de firmar evita la discrepancia.
+    /// </summary>
+    private static void RemoveWhitespaceOnlyTextNodes(XmlDocument xml)
+    {
+        foreach (var text in xml.SelectNodes("//text()[not(normalize-space(.))]")!
+                     .Cast<XmlNode>().ToList())
+            text.ParentNode!.RemoveChild(text);
+    }
 }
