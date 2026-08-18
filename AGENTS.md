@@ -1,9 +1,9 @@
 # AGENTS.md
 
 ## Estado del repositorio
-Proyecto nuevo en scaffolding. Ya existe `LICENSE` (Apache 2.0),
-`docs/PLAN.md` (plan de implementación acordado) y la estructura base de
-la solución. El README y el instalador aún no están terminados.
+Proyecto completo: las 7 fases del plan (`docs/PLAN.md`) están implementadas,
+con README, guía de uso (`docs/USO.md`) e instalador terminados. La release
+`v1.0.0` está publicada en GitHub con el portable y el instalador.
 
 ## Decisiones de diseño acordadas (no renegociar sin el usuario)
 - App de escritorio Windows para visualizar/validar facturas electrónicas
@@ -14,9 +14,10 @@ la solución. El README y el instalador aún no están terminados.
 - Interfaz y mensajes de validación **solo en español** (sin i18n por ahora).
 - Estructura:
   - `src/Facturae.Core/` — parseo XML (`XmlSerializer` desde XSD oficiales),
-    validación XSD 3.2/3.2.1/3.2.2 (esquemas embebidos), firma
+    validación XSD 3.1/3.2/3.2.1/3.2.2 (esquemas embebidos), firma
     XMLDSig/XAdES (`System.Security.Cryptography.Xml` + `X509Chain`),
-    reglas de negocio (NIF/NIE/CIF, coherencia de totales), PDF (QuestPDF).
+    reglas de negocio (NIF/NIE/CIF, coherencia de totales), PDF (QuestPDF),
+    modelo de datos compartido con la app (`Model/ReleaseInfo`).
     Sin dependencias de UI.
   - `src/Facturae.App/` — cliente WPF (Views/ViewModels/Services).
   - `src/Facturae.Tests/` — xUnit con fixtures oficiales de facturae.gob.es.
@@ -25,6 +26,13 @@ la solución. El README y el instalador aún no están terminados.
 
 ## Quirks
 - El CI real es `.github/workflows/build.yml`.
+- El CI descarga xmlsec1 win64 desde las releases de GitHub
+  (`https://github.com/lsh123/xmlsec/releases/download/1.3.12/...`) y define
+  `XMLSEC_BIN` para la verificación cruzada de firmas. Sin esa variable, 4
+  tests de firma cruzada se omiten.
+- El instalador se genera con nombre versionado:
+  `FacturaeViewer-Setup-<versión>.exe`. La app (`UpdateService`) lo detecta
+  por el prefijo `FacturaeViewer-Setup` + `.exe` en los assets de la release.
 - El usuario trabaja en español: respuestas y mensajes de commit en español.
 - `Directory.Build.props` centraliza la configuración común (target
   `net10.0-windows`, nullable, WPF habilitado solo donde se necesita).
@@ -34,5 +42,6 @@ la solución. El README y el instalador aún no están terminados.
 ## Verificación
 - Build/test: `dotnet build` y `dotnet test` desde la raíz.
 - Ejecutable portable:
-  `dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true`
-- Instalador: compilar con `iscc` (Inno Setup) sobre `installer/setup.iss`.
+  `dotnet publish src/Facturae.App -c Release -r win-x64 --self-contained /p:PublishSingleFile=true -o artifacts/publish`
+- Instalador: compilar con `iscc installer/setup.iss` (Inno Setup) sobre el
+  publish anterior; el instalador queda en `artifacts/installer`.
