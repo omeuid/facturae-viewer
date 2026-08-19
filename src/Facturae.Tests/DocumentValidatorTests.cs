@@ -58,5 +58,11 @@ public class DocumentValidatorTests
         Assert.False(report.HasErrors, string.Join("\n", report.Checks.Select(c => c.ToString())));
         Assert.Contains(report.Checks, c => c.Code == "SIG-02" && c.Status == CheckStatus.Passed);
         Assert.Contains(report.Checks, c => c.Code == "SIG-06" && c.Status == CheckStatus.Info);
+
+        // La firma XAdES debe validarse contra su esquema: sin el XSD XAdES el
+        // validador emitía falsos positivos "schema information not found".
+        Assert.Contains(report.Checks, c => c.Code == "SCHEMA" && c.Status == CheckStatus.Passed);
+        Assert.DoesNotContain(report.Checks,
+            c => c.Code == "SCHEMA" && c.Status != CheckStatus.Passed);
     }
 }

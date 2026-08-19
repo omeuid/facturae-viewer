@@ -197,7 +197,11 @@
 <complexType name="X509IssuerSerialType"> 
   <sequence> 
     <element name="X509IssuerName" type="string"/> 
-    <element name="X509SerialNumber" type="integer"/> 
+    <!-- El estándar define X509SerialNumber como integer, pero los serials de
+         certificados pueden superar los ~28 dígitos que .NET valida para
+         xs:integer (límite de decimal). Se valida como string para aceptar
+         serials grandes de la FNMT y otras AC. -->
+    <element name="X509SerialNumber" type="string"/> 
   </sequence>
 </complexType>
 

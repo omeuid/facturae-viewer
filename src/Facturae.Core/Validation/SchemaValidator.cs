@@ -18,10 +18,14 @@ public static class SchemaValidator
 {
     private static readonly Lazy<XmlSchemaSet> SchemaSet = new(BuildSchemaSet);
 
-    /// <summary>Nombres de los esquemas XSD embebidos (orden: xmldsig primero para resolver el import).</summary>
+    /// <summary>
+    /// Nombres de los esquemas XSD embebidos (orden: xmldsig y XAdES primero
+    /// para resolver los imports de los esquemas de Facturae).
+    /// </summary>
     private static readonly string[] EmbeddedSchemas =
     [
         "xmldsig-core-schema.xsd",
+        "XAdES_v1_3_2.xsd",
         "Facturaev3_1.xsd",
         "Facturaev3_2.xsd",
         "Facturaev3_2_1.xsd",

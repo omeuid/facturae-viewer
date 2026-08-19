@@ -162,13 +162,22 @@ internal static class TestSignature
         var signingCertificate = xml.CreateElement("xades", "SigningCertificate", XadesNs);
         var certRef = xml.CreateElement("xades", "Cert", XadesNs);
         var certDigest = xml.CreateElement("xades", "CertDigest", XadesNs);
-        var certDigestMethod = xml.CreateElement("xades", "DigestMethod", XadesNs);
+        var certDigestMethod = xml.CreateElement("ds", "DigestMethod", DsNs);
         certDigestMethod.SetAttribute("Algorithm", DigestSha256);
         certDigest.AppendChild(certDigestMethod);
-        var certDigestValue = xml.CreateElement("xades", "DigestValue", XadesNs);
+        var certDigestValue = xml.CreateElement("ds", "DigestValue", DsNs);
         certDigestValue.InnerText = Convert.ToBase64String(SHA256.HashData(cert.RawData));
         certDigest.AppendChild(certDigestValue);
         certRef.AppendChild(certDigest);
+
+        var issuerSerial = xml.CreateElement("xades", "IssuerSerial", XadesNs);
+        var issuerName = xml.CreateElement("ds", "X509IssuerName", DsNs);
+        issuerName.InnerText = cert.IssuerName.Name;
+        issuerSerial.AppendChild(issuerName);
+        var serialNumber = xml.CreateElement("ds", "X509SerialNumber", DsNs);
+        serialNumber.InnerText = cert.SerialNumber;
+        issuerSerial.AppendChild(serialNumber);
+        certRef.AppendChild(issuerSerial);
         signingCertificate.AppendChild(certRef);
         signedSignatureProperties.AppendChild(signingCertificate);
 
