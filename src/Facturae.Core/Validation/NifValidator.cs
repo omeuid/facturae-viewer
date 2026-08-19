@@ -87,10 +87,26 @@ public static class NifValidator
 
         if (esSpain && !isForeignPerson)
         {
-            bool ok = isCompany ? IsValidCif(id) : IsValidNif(id);
-            return ok
-                ? (CheckStatus.Passed, null)
-                : (CheckStatus.Error, "El identificador no cumple las reglas de formación del NIF/CIF.");
+            if (isCompany)
+            {
+                if (IsValidCif(id))
+                    return (CheckStatus.Passed, null);
+
+                if (IsValidNif(id))
+                    return (CheckStatus.Error,
+                        $"Se declara persona jurídica (J) pero el identificador {id} es un NIF de persona física válido. Si se trata de un autónomo, el tipo de persona debería ser F.");
+
+                return (CheckStatus.Error, "El identificador no cumple las reglas de formación del CIF.");
+            }
+
+            if (IsValidNif(id))
+                return (CheckStatus.Passed, null);
+
+            if (IsValidCif(id))
+                return (CheckStatus.Error,
+                    $"Se declara persona física (F) pero el identificador {id} tiene formato de CIF (persona jurídica).");
+
+            return (CheckStatus.Error, "El identificador no cumple las reglas de formación del NIF.");
         }
 
         // Identificador extranjero: si empieza por dos letras se asume que

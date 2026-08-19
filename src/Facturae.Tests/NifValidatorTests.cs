@@ -75,4 +75,19 @@ public class NifValidatorTests
         Assert.True(report.HasErrors);
         Assert.Contains(report.Checks, c => c.Code == "NIF" && c.Status == CheckStatus.Error);
     }
+
+    [Fact]
+    public void Persona_juridica_con_nif_de_persona_fisica_da_mensaje_clarificador()
+    {
+        var doc = FacturaeLoader.Load(Fixture("Facturae-3.2.2-valid.xml"));
+        var taxId = doc.Facturae.Parties!.BuyerParty!.TaxIdentification;
+        taxId.PersonTypeCode = "J";
+        taxId.TaxIdentificationNumber = "76566838E";
+
+        var report = NifValidator.Validate(doc);
+
+        var check = Assert.Single(report.Checks, c => c.Code == "NIF" && c.Status == CheckStatus.Error);
+        Assert.Contains("persona física", check.Detail ?? string.Empty);
+        Assert.Contains("autónomo", check.Detail ?? string.Empty);
+    }
 }

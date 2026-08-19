@@ -478,37 +478,39 @@
                             <TextBlock Text="{Binding SummaryText}" Foreground="#FFD0D0D0" FontSize="12" Margin="0,6,0,0" />
                         </StackPanel>
                     </Border>
-                    <ItemsControl ItemsSource="{Binding Checks}" Margin="8">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Button Background="#33FFFFFF" BorderThickness="0" Padding="8,6" Margin="0,3"
-                                        HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
-                                        Command="{Binding DataContext.NavigateToCheckCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Cursor="{Binding CanNavigate, Converter={StaticResource BoolToCursor}}"
-                                        ToolTip="Ver el nodo en la pestaña XML">
-                                    <Button.Resources>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="Transparent" />
-                                        </Style>
-                                    </Button.Resources>
-                                    <DockPanel>
-                                        <TextBlock Text="{Binding Status, Converter={StaticResource StatusToGlyph}}"
-                                                   DockPanel.Dock="Left" FontWeight="Bold" Width="20"
-                                                   Foreground="{Binding Status, Converter={StaticResource StatusToBrush}}" />
-                                        <TextBlock Text="{Binding Code}" DockPanel.Dock="Left" FontWeight="SemiBold"
-                                                   FontSize="12" Margin="0,0,8,0"
-                                                   Foreground="{Binding Status, Converter={StaticResource StatusToBrush}}" />
-                                        <TextBlock Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"
-                                                   Foreground="#FF333333" />
-                                        <TextBlock Text="▸" DockPanel.Dock="Right" Foreground="#FF2E7D32"
-                                                   FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center"
-                                                   Visibility="{Binding CanNavigate, Converter={StaticResource BoolToVis}}" />
-                                    </DockPanel>
-                                </Button>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Checks}" Margin="8">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Background="#33FFFFFF" BorderThickness="0" Padding="8,6" Margin="0,3"
+                                            HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch"
+                                            Command="{Binding DataContext.NavigateToCheckCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Cursor="{Binding CanNavigate, Converter={StaticResource BoolToCursor}}"
+                                            ToolTip="Ver el nodo en la pestaña XML">
+                                        <Button.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                        </Button.Resources>
+                                        <DockPanel>
+                                            <TextBlock Text="{Binding Status, Converter={StaticResource StatusToGlyph}}"
+                                                       DockPanel.Dock="Left" FontWeight="Bold" Width="20"
+                                                       Foreground="{Binding Status, Converter={StaticResource StatusToBrush}}" />
+                                            <TextBlock Text="{Binding Code}" DockPanel.Dock="Left" FontWeight="SemiBold"
+                                                       FontSize="12" Margin="0,0,8,0"
+                                                       Foreground="{Binding Status, Converter={StaticResource StatusToBrush}}" />
+                                            <TextBlock Text="{Binding Message}" FontSize="12" TextWrapping="Wrap"
+                                                       Foreground="#FF333333" />
+                                            <TextBlock Text="▸" DockPanel.Dock="Right" Foreground="#FF2E7D32"
+                                                       FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center"
+                                                       Visibility="{Binding CanNavigate, Converter={StaticResource BoolToVis}}" />
+                                        </DockPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </DockPanel>
             </Border>
         </Grid>
