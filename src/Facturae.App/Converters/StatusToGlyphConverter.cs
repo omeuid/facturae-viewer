@@ -22,9 +22,9 @@ public sealed class StatusToGlyphConverter : IValueConverter
                 CheckStatus.Passed => "✓",
                 CheckStatus.Warning => "⚠",
                 CheckStatus.Error => "✕",
-                _ => "•",
+                _ => "ℹ",
             }
-            : "•";
+            : "ℹ";
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotSupportedException();
