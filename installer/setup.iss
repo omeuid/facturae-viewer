@@ -36,6 +36,8 @@ LicenseFile=..\LICENSE
 VersionInfoVersion={#AppVersion}
 VersionInfoCompany={#Publisher}
 VersionInfoDescription={#AppName}
+VersionInfoProductName={#AppName}
+VersionInfoProductVersion={#AppVersion}
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"

@@ -95,8 +95,22 @@ src/Facturae.Tests/   Tests xUnit
 installer/            Instalador Inno Setup (setup.iss)
 docs/PLAN.md          Plan de implementación
 docs/USO.md           Guía de uso con capturas
+docs/SIGNPATH-APPLICATION.md  Ficha para la solicitud de firma de código
 docs/images/          Capturas de la aplicación
 ```
+
+## Code signing policy
+
+Los instaladores de este proyecto se firman con un certificado de firma de
+código emitido a SignPath Foundation y generado en su módulo de seguridad de
+hardware (HSM). La firma garantiza que el instalador fue construido a partir de
+este repositorio y no ha sido modificado.
+
+Cada release requiere la aprobación manual de un responsable del proyecto antes
+de firmarse. Solo se firman binarios generados automáticamente por la
+integración continua a partir del código fuente de este repositorio.
+
+*Free code signing provided by SignPath.io, certificate by SignPath Foundation*
 
 ## Licencia
 
