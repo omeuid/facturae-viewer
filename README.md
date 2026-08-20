@@ -101,13 +101,14 @@ docs/images/          Capturas de la aplicación
 
 ## Code signing policy
 
-Los instaladores de este proyecto se firman con un certificado de firma de
+Los instaladores de este proyecto se firmarán con un certificado de firma de
 código emitido a SignPath Foundation y generado en su módulo de seguridad de
-hardware (HSM). La firma garantiza que el instalador fue construido a partir de
-este repositorio y no ha sido modificado.
+hardware (HSM), una vez la solicitud de admisión sea aprobada. La firma
+garantizará que el instalador fue construido a partir de este repositorio y no
+ha sido modificado.
 
-Cada release requiere la aprobación manual de un responsable del proyecto antes
-de firmarse. Solo se firman binarios generados automáticamente por la
+Cada release requerirá la aprobación manual de un responsable del proyecto antes
+de firmarse. Solo se firmarán binarios generados automáticamente por la
 integración continua a partir del código fuente de este repositorio.
 
 *Free code signing provided by SignPath.io, certificate by SignPath Foundation*
